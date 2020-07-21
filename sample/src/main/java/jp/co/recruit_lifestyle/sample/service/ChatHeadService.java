@@ -1,33 +1,30 @@
 package jp.co.recruit_lifestyle.sample.service;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.IBinder;
-import androidx.core.app.NotificationCompat;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
+import androidx.core.app.NotificationCompat;
+
 import jp.co.recruit.floatingview.R;
 import jp.co.recruit_lifestyle.android.floatingview.FloatingViewListener;
 import jp.co.recruit_lifestyle.android.floatingview.FloatingViewManager;
+import timber.log.Timber;
 
 
 /**
  * ChatHead Service
  */
 public class ChatHeadService extends Service implements FloatingViewListener {
-
-    /**
-     * デバッグログ用のタグ
-     */
-    private static final String TAG = "ChatHeadService";
 
     /**
      * Intent key (Cutout safe area)
@@ -58,11 +55,12 @@ public class ChatHeadService extends Service implements FloatingViewListener {
         final WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         windowManager.getDefaultDisplay().getMetrics(metrics);
         final LayoutInflater inflater = LayoutInflater.from(this);
-        final ImageView iconView = (ImageView) inflater.inflate(R.layout.widget_chathead, null, false);
+        @SuppressLint("InflateParams")
+        ImageView iconView = (ImageView) inflater.inflate(R.layout.widget_chathead, null, false);
         iconView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG, getString(R.string.chathead_click_message));
+                Timber.d(getString(R.string.chathead_click_message));
             }
         });
 
@@ -103,7 +101,7 @@ public class ChatHeadService extends Service implements FloatingViewListener {
     @Override
     public void onFinishFloatingView() {
         stopSelf();
-        Log.d(TAG, getString(R.string.finish_deleted));
+        Timber.d(getString(R.string.finish_deleted));
     }
 
     /**
@@ -112,9 +110,9 @@ public class ChatHeadService extends Service implements FloatingViewListener {
     @Override
     public void onTouchFinished(boolean isFinishing, int x, int y) {
         if (isFinishing) {
-            Log.d(TAG, getString(R.string.deleted_soon));
+            Timber.d(getString(R.string.deleted_soon));
         } else {
-            Log.d(TAG, getString(R.string.touch_finished_position, x, y));
+            Timber.d(getString(R.string.touch_finished_position, x, y));
         }
     }
 
