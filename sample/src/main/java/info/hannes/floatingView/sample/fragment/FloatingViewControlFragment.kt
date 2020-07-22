@@ -25,7 +25,11 @@ import kotlinx.android.synthetic.main.fragment_floating_view_control.*
 class FloatingViewControlFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_floating_view_control, container, false)
+        return inflater.inflate(R.layout.fragment_floating_view_control, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         show_demo.setOnClickListener {
             showFloatingView(activity, true, false)
         }
@@ -38,7 +42,6 @@ class FloatingViewControlFragment : Fragment() {
             ft.addToBackStack(null)
             ft.commit()
         }
-        return rootView
     }
 
     @TargetApi(Build.VERSION_CODES.M)

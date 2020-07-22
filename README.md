@@ -28,36 +28,34 @@ To API Level 16 or higher are supported
   ```
   
 2) Implement Service for displaying FloatingView
-```java
-public class ChatHeadService extends Service {
-  ... ...
+```Kotlin
+class SimpleFloatingViewService : Service(), FloatingViewListener {
+  ...
 }
 ```
   
 3) You will do the setting of the View to be displayed in the FloatingView(Sample have a set in onStartCommand)
-```java
-  final LayoutInflater inflater = LayoutInflater.from(this);
-  final ImageView iconView = (ImageView) inflater.inflate(R.layout.widget_chathead, null, false);
-  iconView.setOnClickListener(......);
+```Kotlin
+    val inflater = LayoutInflater.from(this)
+    val iconView = inflater.inflate(R.layout.widget_mail, null, false) as ImageView
+    iconView.setOnClickListener { }
 ```  
 
 4) Use the FloatingViewManager, make the setting of FloatingView
-```java
-  mFloatingViewManager = new FloatingViewManager(this, this);
-  mFloatingViewManager.setFixedTrashIconImage(R.drawable.ic_trash_fixed);
-  mFloatingViewManager.setActionTrashIconImage(R.drawable.ic_trash_action);
-  final FloatingViewManager.Options options = new FloatingViewManager.Options();
-  options.overMargin = (int) (16 * metrics.density);
-  mFloatingViewManager.addViewToWindow(iconView, options);
+```Kotlin
+    floatingViewManager = FloatingViewManager(this, this).apply {
+        setFixedTrashIconImage(R.drawable.ic_trash_fixed)
+        setActionTrashIconImage(R.drawable.ic_trash_action)
+        setSafeInsetRect(intent.getParcelableExtra<Parcelable>(EXTRA_CUTOUT_SAFE_AREA) as Rect)
+    }
 ```  
 
 The second argument of `FloatingViewManager` is `FloatingViewListener`
   
 Describe the process (`onFinishFloatingView`) that is called when you exit the FloatingView
-```java
-    @Override
-    public void onFinishFloatingView() {
-        stopSelf();
+```Kotlin
+    override fun onFinishFloatingView() {
+        stopSelf()
     }
 ```
   
@@ -69,12 +67,11 @@ Describe the process (`onFinishFloatingView`) that is called when you exit the F
   
 6) Define the Service to AndroidManifest
 
-```java
+```
     <application ...>
         ...
-        <!-- Demo -->
         <service
-            android:name="info.hannes.floatingView.sample.service.ChatHeadService"
+            android:name="info.hannes.floatingView.sample.service.SimpleFloatingViewService"
             android:exported="false"/>
         ...
     </application>
@@ -82,17 +79,17 @@ Describe the process (`onFinishFloatingView`) that is called when you exit the F
   
 7) Describe the process to start the Service (run on foreground)
 
-- FloatingViewControlFragment.java  
+- FloatingViewControlFragment.kt
 
-```java
-    final Intent intent = new Intent(activity, ChatHeadService.class);
-    ContextCompat.startForegroundService(activity, intent);
+```Kotlin
+    val intent = Intent(activity, SimpleFloatingViewService::class.java)
+    ContextCompat.startForegroundService(activity, intent)
 ```
 
-- ChatHeadService.java  
+- SimpleFloatingViewService.kt
 
-```java
-public int onStartCommand(Intent intent, int flags, int startId) {
+```Kotlin
+override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
     ...
     startForeground(NOTIFICATION_ID, createNotification(this));
     ...
@@ -120,28 +117,30 @@ Call `FloatingViewManager.findCutoutSafeArea(activity)`.
 Note: Activity must be portrait oriented.  
 Note: You must not set `windowLayoutInDisplayCutoutMode` to `never`.  
 
-- FloatingViewControlFragment.java
+- FloatingViewControlFragment.kt
 
-```java
-final Intent intent = new Intent(activity, ChatHeadService.class);
-intent.putExtra(ChatHeadService.EXTRA_CUTOUT_SAFE_AREA, FloatingViewManager.findCutoutSafeArea(activity));
-ContextCompat.startForegroundService(activity, intent);
+```Kotlin
+    val intent = Intent(activity, service)
+    intent.putExtra(key, FloatingViewManager.findCutoutSafeArea(activity!!))
+    ContextCompat.startForegroundService(activity, intent)
 ```
 
-- ChatHeadService.java
+- CustomFloatingViewService.kt
 
-```java
-mFloatingViewManager.setSafeInsetRect((Rect) intent.getParcelableExtra(EXTRA_CUTOUT_SAFE_AREA));
+```Kotlin
+    floatingViewManager = FloatingViewManager(this, this).apply {
+        ...
+        setSafeInsetRect(intent.getParcelableExtra<Parcelable>(EXTRA_CUTOUT_SAFE_AREA) as Rect)
+    }
 ```
 
 
 ## Static Options
 It can be set only when displaying for the first time
   
-```java
-final FloatingViewManager.Options options = new FloatingViewManager.Options();
-options.overMargin = (int) (16 * metrics.density);
-mFloatingViewManager.addViewToWindow(iconView, options);
+```Kotlin
+    val options = loadOptions(metrics)
+    floatingViewManager!!.addViewToWindow(iconView, options)
 ```
 
 |Option|Description|  
