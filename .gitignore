@@ -3,5 +3,8 @@ local.properties
 .DS_Store
 build
 captures
-.idea
+
+.idea/*
+!.idea/codeStyles/
+
 *.iml

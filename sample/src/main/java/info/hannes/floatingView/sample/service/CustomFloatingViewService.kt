@@ -16,10 +16,10 @@ import android.view.LayoutInflater
 import android.view.WindowManager
 import android.widget.ImageView
 import androidx.core.app.NotificationCompat
-import info.hannes.floatingview.FloatingViewListener
-import info.hannes.floatingview.FloatingViewManager
 import info.hannes.floatingView.sample.DeleteActionActivity
 import info.hannes.floatingView.sample.R
+import info.hannes.floatingview.FloatingViewListener
+import info.hannes.floatingview.FloatingViewManager
 import timber.log.Timber
 
 class CustomFloatingViewService : Service(), FloatingViewListener {

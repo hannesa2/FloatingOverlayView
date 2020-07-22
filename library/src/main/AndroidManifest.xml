@@ -1,5 +1,5 @@
-<manifest xmlns:tools="http://schemas.android.com/tools"
-    package="info.hannes.floatingview">
+<manifest package="info.hannes.floatingview"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-sdk tools:overrideLibrary="android.support.dynamicanimation" />
 </manifest>

@@ -17,9 +17,9 @@ import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import info.hannes.floatingView.sample.R
-import info.hannes.floatingview.FloatingViewManager
 import info.hannes.floatingView.sample.service.ChatHeadService
 import info.hannes.floatingView.sample.service.CustomFloatingViewService
+import info.hannes.floatingview.FloatingViewManager
 
 class FloatingViewControlFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

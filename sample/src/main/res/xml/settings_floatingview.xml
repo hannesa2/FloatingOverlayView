@@ -7,7 +7,7 @@
         android:entryValues="@array/settings_values_shape"
         android:key="settings_shape"
         android:summary="%s"
-        android:title="@string/settings_title_shape"/>
+        android:title="@string/settings_title_shape" />
 
     <ListPreference
         android:defaultValue="FullScreen"
@@ -15,7 +15,7 @@
         android:entryValues="@array/settings_values_display_mode"
         android:key="settings_display_mode"
         android:summary="%s"
-        android:title="@string/settings_title_display_mode"/>
+        android:title="@string/settings_title_display_mode" />
 
     <ListPreference
         android:defaultValue="0"
@@ -23,7 +23,7 @@
         android:entryValues="@array/settings_values_margin"
         android:key="settings_margin"
         android:summary="%s"
-        android:title="@string/settings_title_margin"/>
+        android:title="@string/settings_title_margin" />
 
     <ListPreference
         android:defaultValue="Default"
@@ -31,20 +31,7 @@
         android:entryValues="@array/settings_values_move_direction"
         android:key="settings_move_direction"
         android:summary="%s"
-        android:title="@string/settings_title_move_direction"/>
-
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="settings_use_physics"
-        android:summary="@string/settings_summary_use_physics"
-        android:title="@string/settings_title_use_physics"/>
-
-    <SwitchPreference
-        android:defaultValue="false"
-        android:disableDependentsState="true"
-        android:key="settings_save_last_position"
-        android:summary="@string/settings_summary_save_position"
-        android:title="@string/settings_title_save_position"/>
+        android:title="@string/settings_title_move_direction" />
 
     <ListPreference
         android:defaultValue="0"
@@ -54,7 +41,7 @@
         android:entryValues="@array/settings_values_init_x"
         android:key="settings_init_x"
         android:summary="%s"
-        android:title="@string/settings_title_init_x"/>
+        android:title="@string/settings_title_init_x" />
 
     <ListPreference
         android:defaultValue="1.0"
@@ -64,11 +51,24 @@
         android:entryValues="@array/settings_values_init_y"
         android:key="settings_init_y"
         android:summary="%s"
-        android:title="@string/settings_title_init_y"/>
+        android:title="@string/settings_title_init_y" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="settings_use_physics"
+        android:summary="@string/settings_summary_use_physics"
+        android:title="@string/settings_title_use_physics" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:disableDependentsState="true"
+        android:key="settings_save_last_position"
+        android:summary="@string/settings_summary_save_position"
+        android:title="@string/settings_title_save_position" />
 
     <SwitchPreference
         android:defaultValue="true"
         android:key="settings_animation"
-        android:title="@string/settings_title_animation"/>
+        android:title="@string/settings_title_animation" />
 
 </PreferenceScreen>
