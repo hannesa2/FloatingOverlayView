@@ -1,5 +1,6 @@
 # FloatingView
-[Archived] Use instead: https://developer.android.com/guide/topics/ui/bubbles
+
+You can use instead: https://developer.android.com/guide/topics/ui/bubbles
 
 The Android project is View to display information such as chat in front.
 To API Level 16 or higher are supported
@@ -9,13 +10,6 @@ To API Level 16 or higher are supported
 <img src="./screenshot/ss01.png" width="200">
 <img src="./screenshot/ss02.png" width="200">
 <img src="./screenshot/ss03.png" width="200">
-  
-*Watch YouTube video*  
-[SimpleFloating](http://youtu.be/nb8M2p0agF4)
-
-## Requirements
-Target Sdk Version : 28  
-Min Sdk Version : 16  
 
 ## How to use
 1) Add this to your **build.gradle**.
@@ -73,7 +67,6 @@ Describe the process (`onFinishFloatingView`) that is called when you exit the F
   
 6) Define the Service to AndroidManifest
 
-example)
 ```java
     <application ...>
         ...
@@ -86,9 +79,6 @@ example)
 ```
   
 7) Describe the process to start the Service (run on foreground)
-
-
-example)  
 
 - FloatingViewControlFragment.java  
 
@@ -109,7 +99,6 @@ public int onStartCommand(Intent intent, int flags, int startId) {
 
 8) Create notification channel (targetSdkVersion >= 26)
 
-example)
 ```java
 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
     final String channelId = getString(R.string.default_floatingview_channel_id);
@@ -129,8 +118,6 @@ Call `FloatingViewManager.findCutoutSafeArea(activity)`.
 Note: Activity must be portrait oriented.  
 Note: You must not set `windowLayoutInDisplayCutoutMode` to `never`.  
 
-example)
-
 - FloatingViewControlFragment.java
 
 ```java
@@ -149,7 +136,6 @@ mFloatingViewManager.setSafeInsetRect((Rect) intent.getParcelableExtra(EXTRA_CUT
 ## Static Options
 It can be set only when displaying for the first time
   
-example)
 ```java
 final FloatingViewManager.Options options = new FloatingViewManager.Options();
 options.overMargin = (int) (16 * metrics.density);
@@ -171,7 +157,6 @@ mFloatingViewManager.addViewToWindow(iconView, options);
 ## Dynamic Options
 It can be set any time  
   
-example)
 ```java
 mFloatingViewManager.setFixedTrashIconImage(R.drawable.ic_trash_fixed);
 mFloatingViewManager.setActionTrashIconImage(R.drawable.ic_trash_action);
@@ -184,16 +169,9 @@ mFloatingViewManager.setActionTrashIconImage(R.drawable.ic_trash_action);
 |setDisplayMode|`FloatingViewManager.DISPLAY_MODE_SHOW_ALWAYS`:Always show<br>`FloatingViewManager.DISPLAY_MODE_HIDE_ALWAYS`:Always hidden<br>`FloatingViewManager.DISPLAY_MODE_HIDE_FULLSCREEN`:It is hidden when in full screen|
 |setTrashViewEnabled|If false, the trash icon does not show during dragging.<br>(default) true|
 
-# Credits
-
-FloatingView is owned and maintained by [RECRUIT LIFESTYLE CO., LTD.](http://www.recruit-lifestyle.co.jp/)
-
-FloatingView was originally created by [Yoshihide Sogawa](https://twitter.com/egg_sogawa)  
-
-
 # License
 
-    Copyright 2015 RECRUIT LIFESTYLE CO., LTD.
+    Copyright 2020 hannesa2
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
