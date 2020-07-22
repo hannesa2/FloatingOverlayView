@@ -69,8 +69,7 @@ class FloatingViewManager(private val context: Context, listener: FloatingViewLi
         isHideStatusBar = isFitSystemWindowTop
 
         // detect navigation bar
-        val isHideNavigationBar: Boolean
-        isHideNavigationBar = if (visibility == FullscreenObserverView.NO_LAST_VISIBILITY) {
+        val isHideNavigationBar: Boolean = if (visibility == FullscreenObserverView.NO_LAST_VISIBILITY) {
             // At the first it can not get the correct value, so do special processing
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                 windowManager.defaultDisplay.getRealMetrics(displayMetrics)
