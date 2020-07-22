@@ -240,6 +240,8 @@ class FloatingViewManager(private val context: Context, listener: FloatingViewLi
         floatingView.setOnTouchListener(this)
         floatingView.shape = options.shape
         floatingView.setOverMargin(options.overMargin)
+        floatingView.setOverMarginX(options.overMarginX)
+        floatingView.setOverMarginY(options.overMarginY)
         floatingView.setMoveDirection(options.moveDirection)
         floatingView.usePhysics(options.usePhysics)
         floatingView.setAnimateInitialMove(options.animateInitialMove)
@@ -297,6 +299,8 @@ class FloatingViewManager(private val context: Context, listener: FloatingViewLi
     class Options {
         var shape: Float = SHAPE_CIRCLE
         var overMargin: Int = 0
+        var overMarginX: Int = 0
+        var overMarginY: Int = 0
         var floatingViewX: Int = FloatingView.DEFAULT_X
         var floatingViewY: Int = FloatingView.DEFAULT_Y
         var floatingViewWidth: Int = FloatingView.DEFAULT_WIDTH
