@@ -19,6 +19,7 @@ import androidx.core.view.ViewCompat
 import androidx.dynamicanimation.animation.*
 import androidx.dynamicanimation.animation.DynamicAnimation.OnAnimationUpdateListener
 import java.lang.ref.WeakReference
+import kotlin.math.min
 
 /**
  * http://stackoverflow.com/questions/18503050/how-to-create-draggabble-system-alert-in-android
@@ -556,20 +557,20 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
         if (goalPositionX == currentX) {
             //to move only y coord
             moveEdgeAnimator = ValueAnimator.ofInt(currentY, goalPositionY)
-            moveEdgeAnimator?.addUpdateListener({ animation ->
+            moveEdgeAnimator?.addUpdateListener { animation ->
                 windowLayoutParams.y = (animation.animatedValue as Int)
                 updateViewLayout()
                 updateInitAnimation(animation)
-            })
+            }
         } else {
             // To move only x coord (to left or right)
             windowLayoutParams.y = goalPositionY
             moveEdgeAnimator = ValueAnimator.ofInt(currentX, goalPositionX)
-            moveEdgeAnimator?.addUpdateListener({ animation ->
+            moveEdgeAnimator?.addUpdateListener { animation ->
                 windowLayoutParams.x = (animation.animatedValue as Int)
                 updateViewLayout()
                 updateInitAnimation(animation)
-            })
+            }
         }
         moveEdgeAnimator?.apply {
             duration = MOVE_TO_EDGE_DURATION
@@ -709,8 +710,8 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
         } else if (moveDirection == FloatingViewManager.MOVE_DIRECTION_RIGHT) {
             goalPositionX = positionLimitRect.right
         } else if (moveDirection == FloatingViewManager.MOVE_DIRECTION_NEAREST) {
-            val distLeftRight = Math.min(startX, positionLimitRect.width() - startX)
-            val distTopBottom = Math.min(startY, positionLimitRect.height() - startY)
+            val distLeftRight = min(startX, positionLimitRect.width() - startX)
+            val distTopBottom = min(startY, positionLimitRect.height() - startY)
             if (distLeftRight < distTopBottom) {
                 val isMoveRightEdge = startX > (metrics.widthPixels - width) / 2
                 goalPositionX = if (isMoveRightEdge) positionLimitRect.right else positionLimitRect.left
@@ -795,7 +796,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
      * Use dynamic physics-based animations or not
      * Warning: Can not be used before API 16
      *
-     * @param usePhysics Setting this to false will revert to using a ValueAnimator (default is true)
+     * @param usePhysicsVal Setting this to false will revert to using a ValueAnimator (default is true)
      */
     fun usePhysics(usePhysicsVal: Boolean) {
         usePhysics = usePhysicsVal && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
