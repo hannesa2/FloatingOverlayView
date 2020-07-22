@@ -26,7 +26,7 @@
             android:launchMode="singleInstance" />
 
         <service
-            android:name="info.hannes.floatingView.sample.service.ChatHeadService"
+            android:name="info.hannes.floatingView.sample.service.SimpleFloatingViewService"
             android:exported="false" />
         <service
             android:name="info.hannes.floatingView.sample.service.CustomFloatingViewService"

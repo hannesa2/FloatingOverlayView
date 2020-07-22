@@ -26,7 +26,6 @@ class CustomFloatingViewService : Service(), FloatingViewListener {
 
     private var floatingViewManager: FloatingViewManager? = null
 
-
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         if (floatingViewManager != null) {
             return START_STICKY
@@ -37,12 +36,12 @@ class CustomFloatingViewService : Service(), FloatingViewListener {
         val inflater = LayoutInflater.from(this)
         val iconView = inflater.inflate(R.layout.widget_mail, null, false) as ImageView
         iconView.setOnClickListener {
-            val intent = Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", getString(R.string.mail_address), null))
-            intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.mail_title))
-            intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.mail_content))
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
-            Timber.d("iconView")
+            val intentSend = Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", getString(R.string.mail_address), null))
+            intentSend.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.mail_title))
+            intentSend.putExtra(Intent.EXTRA_TEXT, getString(R.string.mail_content))
+            intentSend.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intentSend)
+            Timber.d("intentSend")
         }
         floatingViewManager = FloatingViewManager(this, this).apply {
             setFixedTrashIconImage(R.drawable.ic_trash_fixed)
