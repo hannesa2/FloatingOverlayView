@@ -87,44 +87,50 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
      */
     private val safeInsetRect: Rect
 
-    companion object {
-        private const val SCALE_PRESSED = 0.9f
-        private const val SCALE_NORMAL = 1.0f
-        private const val MOVE_TO_EDGE_DURATION = 450L
-        private const val MOVE_TO_EDGE_OVERSHOOT_TENSION = 1.25f
-        private const val ANIMATION_SPRING_X_DAMPING_RATIO = 0.7f
-        private const val ANIMATION_SPRING_X_STIFFNESS = 350f
-        private const val ANIMATION_FLING_X_FRICTION = 1.7f
-        private const val ANIMATION_FLING_Y_FRICTION = 1.7f
-        private const val CURRENT_VELOCITY_UNITS = 1000
-        const val STATE_NORMAL = 0
-        const val STATE_INTERSECTING = 1
-        const val STATE_FINISHING = 2
-        private val LONG_PRESS_TIMEOUT = (1.5f * ViewConfiguration.getLongPressTimeout()).toInt()
-        private const val MAX_X_VELOCITY_SCALE_DOWN_VALUE = 9f
-        private const val MAX_Y_VELOCITY_SCALE_DOWN_VALUE = 8f
-        private const val THROW_THRESHOLD_SCALE_DOWN_VALUE = 9f
-        const val DEFAULT_X = Int.MIN_VALUE
-        const val DEFAULT_Y = Int.MIN_VALUE
-        const val DEFAULT_WIDTH = ViewGroup.LayoutParams.WRAP_CONTENT
-        const val DEFAULT_HEIGHT = ViewGroup.LayoutParams.WRAP_CONTENT
-        private var OVERLAY_TYPE = 0
-        private fun getSystemUiDimensionPixelSize(resources: Resources, resName: String): Int {
-            var pixelSize = 0
-            val resId = resources.getIdentifier(resName, "dimen", "android")
-            if (resId > 0) {
-                pixelSize = resources.getDimensionPixelSize(resId)
-            }
-            return pixelSize
+    init {
+        windowManager.defaultDisplay.getMetrics(metrics)
+        windowLayoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT
+        windowLayoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+        windowLayoutParams.type = OVERLAY_TYPE
+        windowLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
+        windowLayoutParams.format = PixelFormat.TRANSLUCENT
+        windowLayoutParams.gravity = Gravity.LEFT or Gravity.BOTTOM
+        animationHandler = FloatingAnimationHandler(this)
+        longPressHandler = LongPressHandler(this)
+        moveEdgeInterpolator = OvershootInterpolator(MOVE_TO_EDGE_OVERSHOOT_TENSION)
+        moveDirection = FloatingViewManager.MOVE_DIRECTION_DEFAULT
+        usePhysics = false
+        val resources = context.resources
+        tablet = resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_LARGE
+        rotation = windowManager.defaultDisplay.rotation
+        moveLimitRect1 = Rect()
+        positionLimitRect = Rect()
+        safeInsetRect = Rect()
+        baseStatusBarHeight = getSystemUiDimensionPixelSize(resources, "status_bar_height")
+        // Check landscape resource id
+        val statusBarLandscapeResId = resources.getIdentifier("status_bar_height_landscape", "dimen", "android")
+        baseStatusBarRotatedHeight = if (statusBarLandscapeResId > 0) {
+            getSystemUiDimensionPixelSize(resources, "status_bar_height_landscape")
+        } else {
+            baseStatusBarHeight
         }
 
-        init {
-            OVERLAY_TYPE = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
-                WindowManager.LayoutParams.TYPE_PRIORITY_PHONE
-            } else {
-                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-            }
+        // Init physics-based animation properties
+        updateViewConfiguration()
+
+        // Detect NavigationBar
+        if (hasSoftNavigationBar()) {
+            baseNavigationBarHeight = getSystemUiDimensionPixelSize(resources, "navigation_bar_height")
+            val resName = if (tablet) "navigation_bar_height_landscape" else "navigation_bar_width"
+            baseNavigationBarRotatedHeight = getSystemUiDimensionPixelSize(resources, resName)
+        } else {
+            baseNavigationBarHeight = 0
+            baseNavigationBarRotatedHeight = 0
         }
+        viewTreeObserver.addOnPreDrawListener(this)
     }
 
     private fun hasSoftNavigationBar(): Boolean {
@@ -960,49 +966,43 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
         }
     }
 
-    init {
-        windowManager.defaultDisplay.getMetrics(metrics)
-        windowLayoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT
-        windowLayoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-        windowLayoutParams.type = OVERLAY_TYPE
-        windowLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
-                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
-        windowLayoutParams.format = PixelFormat.TRANSLUCENT
-        windowLayoutParams.gravity = Gravity.LEFT or Gravity.BOTTOM
-        animationHandler = FloatingAnimationHandler(this)
-        longPressHandler = LongPressHandler(this)
-        moveEdgeInterpolator = OvershootInterpolator(MOVE_TO_EDGE_OVERSHOOT_TENSION)
-        moveDirection = FloatingViewManager.MOVE_DIRECTION_DEFAULT
-        usePhysics = false
-        val resources = context.resources
-        tablet = resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_LARGE
-        rotation = windowManager.defaultDisplay.rotation
-        moveLimitRect1 = Rect()
-        positionLimitRect = Rect()
-        safeInsetRect = Rect()
-        baseStatusBarHeight = getSystemUiDimensionPixelSize(resources, "status_bar_height")
-        // Check landscape resource id
-        val statusBarLandscapeResId = resources.getIdentifier("status_bar_height_landscape", "dimen", "android")
-        baseStatusBarRotatedHeight = if (statusBarLandscapeResId > 0) {
-            getSystemUiDimensionPixelSize(resources, "status_bar_height_landscape")
-        } else {
-            baseStatusBarHeight
+    companion object {
+        private const val SCALE_PRESSED = 0.9f
+        private const val SCALE_NORMAL = 1.0f
+        private const val MOVE_TO_EDGE_DURATION = 450L
+        private const val MOVE_TO_EDGE_OVERSHOOT_TENSION = 1.25f
+        private const val ANIMATION_SPRING_X_DAMPING_RATIO = 0.7f
+        private const val ANIMATION_SPRING_X_STIFFNESS = 350f
+        private const val ANIMATION_FLING_X_FRICTION = 1.7f
+        private const val ANIMATION_FLING_Y_FRICTION = 1.7f
+        private const val CURRENT_VELOCITY_UNITS = 1000
+        const val STATE_NORMAL = 0
+        const val STATE_INTERSECTING = 1
+        const val STATE_FINISHING = 2
+        private val LONG_PRESS_TIMEOUT = (1.5f * ViewConfiguration.getLongPressTimeout()).toInt()
+        private const val MAX_X_VELOCITY_SCALE_DOWN_VALUE = 9f
+        private const val MAX_Y_VELOCITY_SCALE_DOWN_VALUE = 8f
+        private const val THROW_THRESHOLD_SCALE_DOWN_VALUE = 9f
+        const val DEFAULT_X = Int.MIN_VALUE
+        const val DEFAULT_Y = Int.MIN_VALUE
+        const val DEFAULT_WIDTH = ViewGroup.LayoutParams.WRAP_CONTENT
+        const val DEFAULT_HEIGHT = ViewGroup.LayoutParams.WRAP_CONTENT
+        private var OVERLAY_TYPE = 0
+        private fun getSystemUiDimensionPixelSize(resources: Resources, resName: String): Int {
+            var pixelSize = 0
+            val resId = resources.getIdentifier(resName, "dimen", "android")
+            if (resId > 0) {
+                pixelSize = resources.getDimensionPixelSize(resId)
+            }
+            return pixelSize
         }
 
-        // Init physics-based animation properties
-        updateViewConfiguration()
-
-        // Detect NavigationBar
-        if (hasSoftNavigationBar()) {
-            baseNavigationBarHeight = getSystemUiDimensionPixelSize(resources, "navigation_bar_height")
-            val resName = if (tablet) "navigation_bar_height_landscape" else "navigation_bar_width"
-            baseNavigationBarRotatedHeight = getSystemUiDimensionPixelSize(resources, resName)
-        } else {
-            baseNavigationBarHeight = 0
-            baseNavigationBarRotatedHeight = 0
+        init {
+            OVERLAY_TYPE = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+                WindowManager.LayoutParams.TYPE_PRIORITY_PHONE
+            } else {
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+            }
         }
-        viewTreeObserver.addOnPreDrawListener(this)
     }
 }

@@ -16,43 +16,51 @@ import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.IntDef
-import java.lang.annotation.Retention
-import java.lang.annotation.RetentionPolicy
 import java.util.*
 
-class FloatingViewManager(private val mContext: Context, listener: FloatingViewListener?) : ScreenChangedListener, OnTouchListener, TrashViewListener {
+class FloatingViewManager(private val context: Context, listener: FloatingViewListener?) : ScreenChangedListener, OnTouchListener, TrashViewListener {
+
     @IntDef(DISPLAY_MODE_SHOW_ALWAYS, DISPLAY_MODE_HIDE_ALWAYS, DISPLAY_MODE_HIDE_FULLSCREEN)
-    @Retention(RetentionPolicy.SOURCE)
+    @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
     annotation class DisplayMode
 
     @IntDef(MOVE_DIRECTION_DEFAULT, MOVE_DIRECTION_LEFT, MOVE_DIRECTION_RIGHT, MOVE_DIRECTION_NEAREST, MOVE_DIRECTION_NONE, MOVE_DIRECTION_THROWN)
-    @Retention(RetentionPolicy.SOURCE)
+    @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
     annotation class MoveDirection
 
-    private val mResources: Resources
-    private val mWindowManager: WindowManager
-    private val mDisplayMetrics: DisplayMetrics
-    private var mTargetFloatingView: FloatingView? = null
-    private val mFullscreenObserverView: FullscreenObserverView
-    private val mTrashView: TrashView
-    private val mFloatingViewListener: FloatingViewListener?
-    private val mFloatingViewRect: Rect
-    private val mTrashViewRect: Rect
-    private var mIsMoveAccept: Boolean
+    private val resources: Resources = context.resources
+    private val windowManager: WindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+    private val displayMetrics: DisplayMetrics = DisplayMetrics()
+    private var targetFloatingView: FloatingView? = null
+    private val fullscreenObserverView: FullscreenObserverView
+    private val trashView: TrashView
+    private val floatingViewListener: FloatingViewListener? = listener
+    private val floatingViewRect: Rect = Rect()
+    private val trashViewRect: Rect = Rect()
+    private var moveAccept: Boolean
 
     @DisplayMode
-    private var mDisplayMode: Int
-    private val mSafeInsetRect: Rect
-    private val mFloatingViewList: ArrayList<FloatingView>
+    private var displayMode: Int
+    private val safeInsetRect: Rect
+    private val floatingViewList: ArrayList<FloatingView>
     private val isIntersectWithTrash: Boolean
         get() {
-            if (!mTrashView.isTrashEnabled) {
+            if (!trashView.isTrashEnabled) {
                 return false
             }
-            mTrashView.getWindowDrawingRect(mTrashViewRect)
-            mTargetFloatingView!!.getWindowDrawingRect(mFloatingViewRect)
-            return Rect.intersects(mTrashViewRect, mFloatingViewRect)
+            trashView.getWindowDrawingRect(trashViewRect)
+            targetFloatingView!!.getWindowDrawingRect(floatingViewRect)
+            return Rect.intersects(trashViewRect, floatingViewRect)
         }
+
+    init {
+        moveAccept = false
+        displayMode = DISPLAY_MODE_HIDE_FULLSCREEN
+        safeInsetRect = Rect()
+        floatingViewList = ArrayList()
+        fullscreenObserverView = FullscreenObserverView(context, this)
+        trashView = TrashView(context)
+    }
 
     override fun onScreenChanged(windowRect: Rect?, visibility: Int) {
         // detect status bar
@@ -65,139 +73,139 @@ class FloatingViewManager(private val mContext: Context, listener: FloatingViewL
         isHideNavigationBar = if (visibility == FullscreenObserverView.NO_LAST_VISIBILITY) {
             // At the first it can not get the correct value, so do special processing
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                mWindowManager.defaultDisplay.getRealMetrics(mDisplayMetrics)
-                windowRect.width() - mDisplayMetrics.widthPixels == 0 && windowRect.bottom - mDisplayMetrics.heightPixels == 0
+                windowManager.defaultDisplay.getRealMetrics(displayMetrics)
+                windowRect.width() - displayMetrics.widthPixels == 0 && windowRect.bottom - displayMetrics.heightPixels == 0
             } else {
-                mWindowManager.defaultDisplay.getMetrics(mDisplayMetrics)
-                windowRect.width() - mDisplayMetrics.widthPixels > 0 || windowRect.height() - mDisplayMetrics.heightPixels > 0
+                windowManager.defaultDisplay.getMetrics(displayMetrics)
+                windowRect.width() - displayMetrics.widthPixels > 0 || windowRect.height() - displayMetrics.heightPixels > 0
             }
         } else {
             visibility and View.SYSTEM_UI_FLAG_HIDE_NAVIGATION == View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
         }
-        val isPortrait = mResources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+        val isPortrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
         // update FloatingView layout
-        mTargetFloatingView!!.onUpdateSystemLayout(isHideStatusBar, isHideNavigationBar, isPortrait, windowRect)
-        if (mDisplayMode != DISPLAY_MODE_HIDE_FULLSCREEN) {
+        targetFloatingView!!.onUpdateSystemLayout(isHideStatusBar, isHideNavigationBar, isPortrait, windowRect)
+        if (displayMode != DISPLAY_MODE_HIDE_FULLSCREEN) {
             return
         }
-        mIsMoveAccept = false
-        val state = mTargetFloatingView!!.state
+        moveAccept = false
+        val state = targetFloatingView!!.state
         if (state == FloatingView.STATE_NORMAL) {
-            val size = mFloatingViewList.size
+            val size = floatingViewList.size
             for (i in 0 until size) {
-                val floatingView = mFloatingViewList[i]
+                val floatingView = floatingViewList[i]
                 floatingView.visibility = if (isFitSystemWindowTop) View.GONE else View.VISIBLE
             }
-            mTrashView.dismiss()
+            trashView.dismiss()
         } else if (state == FloatingView.STATE_INTERSECTING) {
-            mTargetFloatingView!!.setFinishing()
-            mTrashView.dismiss()
+            targetFloatingView!!.setFinishing()
+            trashView.dismiss()
         }
     }
 
     override fun onUpdateActionTrashIcon() {
-        mTrashView.updateActionTrashIcon(mTargetFloatingView!!.measuredWidth.toFloat(), mTargetFloatingView!!.measuredHeight.toFloat(), mTargetFloatingView!!.shape)
+        trashView.updateActionTrashIcon(targetFloatingView!!.measuredWidth.toFloat(), targetFloatingView!!.measuredHeight.toFloat(), targetFloatingView!!.shape)
     }
 
     override fun onTrashAnimationStarted(@TrashView.AnimationState animationCode: Int) {
         if (animationCode == TrashView.ANIMATION_CLOSE || animationCode == TrashView.ANIMATION_FORCE_CLOSE) {
-            val size = mFloatingViewList.size
+            val size = floatingViewList.size
             for (i in 0 until size) {
-                val floatingView = mFloatingViewList[i]
+                val floatingView = floatingViewList[i]
                 floatingView.setDraggable(false)
             }
         }
     }
 
     override fun onTrashAnimationEnd(@TrashView.AnimationState animationCode: Int) {
-        val state = mTargetFloatingView!!.state
+        val state = targetFloatingView!!.state
         if (state == FloatingView.STATE_FINISHING) {
-            removeViewToWindow(mTargetFloatingView)
+            removeViewToWindow(targetFloatingView)
         }
-        val size = mFloatingViewList.size
+        val size = floatingViewList.size
         for (i in 0 until size) {
-            val floatingView = mFloatingViewList[i]
+            val floatingView = floatingViewList[i]
             floatingView.setDraggable(true)
         }
     }
 
     override fun onTouch(v: View, event: MotionEvent): Boolean {
         val action = event.action
-        if (action != MotionEvent.ACTION_DOWN && !mIsMoveAccept) {
+        if (action != MotionEvent.ACTION_DOWN && !moveAccept) {
             return false
         }
-        val state = mTargetFloatingView!!.state
-        mTargetFloatingView = v as FloatingView
+        val state = targetFloatingView!!.state
+        targetFloatingView = v as FloatingView
         if (action == MotionEvent.ACTION_DOWN) {
-            mIsMoveAccept = true
+            moveAccept = true
         } else if (action == MotionEvent.ACTION_MOVE) {
             val isIntersecting = isIntersectWithTrash
             val isIntersect = state == FloatingView.STATE_INTERSECTING
             if (isIntersecting) {
-                mTargetFloatingView!!.setIntersecting(mTrashView.trashIconCenterX.toInt(), mTrashView.trashIconCenterY.toInt())
+                targetFloatingView!!.setIntersecting(trashView.trashIconCenterX.toInt(), trashView.trashIconCenterY.toInt())
             }
             if (isIntersecting && !isIntersect) {
-                mTargetFloatingView!!.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                mTrashView.setScaleTrashIcon(true)
+                targetFloatingView!!.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                trashView.setScaleTrashIcon(true)
             } else if (!isIntersecting && isIntersect) {
-                mTargetFloatingView!!.setNormal()
-                mTrashView.setScaleTrashIcon(false)
+                targetFloatingView!!.setNormal()
+                trashView.setScaleTrashIcon(false)
             }
         } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
             if (state == FloatingView.STATE_INTERSECTING) {
-                mTargetFloatingView!!.setFinishing()
-                mTrashView.setScaleTrashIcon(false)
+                targetFloatingView!!.setFinishing()
+                trashView.setScaleTrashIcon(false)
             }
-            mIsMoveAccept = false
-            if (mFloatingViewListener != null) {
-                val isFinishing = mTargetFloatingView!!.state == FloatingView.STATE_FINISHING
-                val params = mTargetFloatingView!!.windowLayoutParams
-                mFloatingViewListener.onTouchFinished(isFinishing, params.x, params.y)
+            moveAccept = false
+            if (floatingViewListener != null) {
+                val isFinishing = targetFloatingView!!.state == FloatingView.STATE_FINISHING
+                val params = targetFloatingView!!.windowLayoutParams
+                floatingViewListener.onTouchFinished(isFinishing, params.x, params.y)
             }
         }
         if (state == FloatingView.STATE_INTERSECTING) {
-            mTrashView.onTouchFloatingView(event, mFloatingViewRect.left.toFloat(), mFloatingViewRect.top.toFloat())
+            trashView.onTouchFloatingView(event, floatingViewRect.left.toFloat(), floatingViewRect.top.toFloat())
         } else {
-            val params = mTargetFloatingView!!.windowLayoutParams
-            mTrashView.onTouchFloatingView(event, params.x.toFloat(), params.y.toFloat())
+            val params = targetFloatingView!!.windowLayoutParams
+            trashView.onTouchFloatingView(event, params.x.toFloat(), params.y.toFloat())
         }
         return false
     }
 
     fun setFixedTrashIconImage(@DrawableRes resId: Int) {
-        mTrashView.setFixedTrashIconImage(resId)
+        trashView.setFixedTrashIconImage(resId)
     }
 
     fun setActionTrashIconImage(@DrawableRes resId: Int) {
-        mTrashView.setActionTrashIconImage(resId)
+        trashView.setActionTrashIconImage(resId)
     }
 
     fun setFixedTrashIconImage(drawable: Drawable?) {
-        mTrashView.setFixedTrashIconImage(drawable)
+        trashView.setFixedTrashIconImage(drawable)
     }
 
     fun setActionTrashIconImage(drawable: Drawable?) {
-        mTrashView.setActionTrashIconImage(drawable)
+        trashView.setActionTrashIconImage(drawable)
     }
 
-    fun setDisplayMode(@DisplayMode displayMode: Int) {
-        mDisplayMode = displayMode
-        if (mDisplayMode == DISPLAY_MODE_SHOW_ALWAYS || mDisplayMode == DISPLAY_MODE_HIDE_FULLSCREEN) {
-            for (floatingView in mFloatingViewList) {
+    fun setDisplayMode(@DisplayMode displayModeVal: Int) {
+        displayMode = displayModeVal
+        if (displayMode == DISPLAY_MODE_SHOW_ALWAYS || displayMode == DISPLAY_MODE_HIDE_FULLSCREEN) {
+            for (floatingView in floatingViewList) {
                 floatingView.visibility = View.VISIBLE
             }
-        } else if (mDisplayMode == DISPLAY_MODE_HIDE_ALWAYS) {
-            for (floatingView in mFloatingViewList) {
+        } else if (displayMode == DISPLAY_MODE_HIDE_ALWAYS) {
+            for (floatingView in floatingViewList) {
                 floatingView.visibility = View.GONE
             }
-            mTrashView.dismiss()
+            trashView.dismiss()
         }
     }
 
     var isTrashViewEnabled: Boolean
-        get() = mTrashView.isTrashEnabled
+        get() = trashView.isTrashEnabled
         set(enabled) {
-            mTrashView.isTrashEnabled = enabled
+            trashView.isTrashEnabled = enabled
         }
 
     /**
@@ -206,28 +214,28 @@ class FloatingViewManager(private val mContext: Context, listener: FloatingViewL
      *
      * @param safeInsetRect DisplayCutout#getSafeInsetXXX
      */
-    fun setSafeInsetRect(safeInsetRect: Rect?) {
-        if (safeInsetRect == null) {
-            mSafeInsetRect.setEmpty()
+    fun setSafeInsetRect(safeInsetRectVal: Rect?) {
+        if (safeInsetRectVal == null) {
+            safeInsetRect.setEmpty()
         } else {
-            mSafeInsetRect.set(safeInsetRect)
+            safeInsetRect.set(safeInsetRectVal)
         }
-        val size = mFloatingViewList.size
+        val size = floatingViewList.size
         if (size == 0) {
             return
         }
         for (i in 0 until size) {
-            val floatingView = mFloatingViewList[i]
-            floatingView.setSafeInsetRect(mSafeInsetRect)
+            val floatingView = floatingViewList[i]
+            floatingView.setSafeInsetRect(safeInsetRect)
         }
         // dirty hack
-        mFullscreenObserverView.onGlobalLayout()
+        fullscreenObserverView.onGlobalLayout()
     }
 
     fun addViewToWindow(view: View, options: Options) {
-        val isFirstAttach = mFloatingViewList.isEmpty()
+        val isFirstAttach = floatingViewList.isEmpty()
         // FloatingView
-        val floatingView = FloatingView(mContext)
+        val floatingView = FloatingView(context)
         floatingView.setInitCoords(options.floatingViewX, options.floatingViewY)
         floatingView.setOnTouchListener(this)
         floatingView.shape = options.shape
@@ -235,85 +243,73 @@ class FloatingViewManager(private val mContext: Context, listener: FloatingViewL
         floatingView.setMoveDirection(options.moveDirection)
         floatingView.usePhysics(options.usePhysics)
         floatingView.setAnimateInitialMove(options.animateInitialMove)
-        floatingView.setSafeInsetRect(mSafeInsetRect)
+        floatingView.setSafeInsetRect(safeInsetRect)
 
         // set FloatingView size
         val targetParams = FrameLayout.LayoutParams(options.floatingViewWidth, options.floatingViewHeight)
         view.layoutParams = targetParams
         floatingView.addView(view)
-        if (mDisplayMode == DISPLAY_MODE_HIDE_ALWAYS) {
+        if (displayMode == DISPLAY_MODE_HIDE_ALWAYS) {
             floatingView.visibility = View.GONE
         }
-        mFloatingViewList.add(floatingView)
-        mTrashView.setTrashViewListener(this)
-        mWindowManager.addView(floatingView, floatingView.windowLayoutParams)
+        floatingViewList.add(floatingView)
+        trashView.setTrashViewListener(this)
+        windowManager.addView(floatingView, floatingView.windowLayoutParams)
         if (isFirstAttach) {
-            mWindowManager.addView(mFullscreenObserverView, mFullscreenObserverView.windowLayoutParams)
-            mTargetFloatingView = floatingView
+            windowManager.addView(fullscreenObserverView, fullscreenObserverView.windowLayoutParams)
+            targetFloatingView = floatingView
         } else {
-            removeViewImmediate(mTrashView)
+            removeViewImmediate(trashView)
         }
-        mWindowManager.addView(mTrashView, mTrashView.layoutParams)
+        windowManager.addView(trashView, trashView.layoutParams)
     }
 
     private fun removeViewToWindow(floatingView: FloatingView?) {
-        val matchIndex = mFloatingViewList.indexOf(floatingView)
+        val matchIndex = floatingViewList.indexOf(floatingView)
         if (matchIndex != -1) {
             removeViewImmediate(floatingView)
-            mFloatingViewList.removeAt(matchIndex)
+            floatingViewList.removeAt(matchIndex)
         }
-        if (mFloatingViewList.isEmpty()) {
+        if (floatingViewList.isEmpty()) {
             // 終了を通知
-            mFloatingViewListener?.onFinishFloatingView()
+            floatingViewListener?.onFinishFloatingView()
         }
     }
 
     fun removeAllViewToWindow() {
-        removeViewImmediate(mFullscreenObserverView)
-        removeViewImmediate(mTrashView)
-        val size = mFloatingViewList.size
+        removeViewImmediate(fullscreenObserverView)
+        removeViewImmediate(trashView)
+        val size = floatingViewList.size
         for (i in 0 until size) {
-            val floatingView = mFloatingViewList[i]
+            val floatingView = floatingViewList[i]
             removeViewImmediate(floatingView)
         }
-        mFloatingViewList.clear()
+        floatingViewList.clear()
     }
 
     private fun removeViewImmediate(view: View?) {
         try {
-            mWindowManager.removeViewImmediate(view)
+            windowManager.removeViewImmediate(view)
         } catch (ignored: IllegalArgumentException) {
         }
     }
 
     class Options {
-        var shape: Float
-        var overMargin: Int
-        var floatingViewX: Int
-        var floatingViewY: Int
-        var floatingViewWidth: Int
-        var floatingViewHeight: Int
+        var shape: Float = SHAPE_CIRCLE
+        var overMargin: Int = 0
+        var floatingViewX: Int = FloatingView.DEFAULT_X
+        var floatingViewY: Int = FloatingView.DEFAULT_Y
+        var floatingViewWidth: Int = FloatingView.DEFAULT_WIDTH
+        var floatingViewHeight: Int = FloatingView.DEFAULT_HEIGHT
 
         @MoveDirection
-        var moveDirection: Int
+        var moveDirection: Int = MOVE_DIRECTION_DEFAULT
 
         /**
          * Use of physics-based animations or (default) ValueAnimation
          */
-        var usePhysics: Boolean
-        var animateInitialMove: Boolean
-
-        init {
-            shape = SHAPE_CIRCLE
-            overMargin = 0
-            floatingViewX = FloatingView.DEFAULT_X
-            floatingViewY = FloatingView.DEFAULT_Y
-            floatingViewWidth = FloatingView.DEFAULT_WIDTH
-            floatingViewHeight = FloatingView.DEFAULT_HEIGHT
-            moveDirection = MOVE_DIRECTION_DEFAULT
-            usePhysics = true
-            animateInitialMove = true
-        }
+        var usePhysics: Boolean = true
+        var animateInitialMove: Boolean = true
     }
 
     companion object {
@@ -336,31 +332,17 @@ class FloatingViewManager(private val mContext: Context, listener: FloatingViewL
          * @return Safe cutout insets.
          */
         fun findCutoutSafeArea(activity: Activity): Rect {
-            val safeInsetRect = Rect()
+            val safeInsetRectInternal = Rect()
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-                return safeInsetRect
+                return safeInsetRectInternal
             }
-            val windowInsets = activity.window.decorView.rootWindowInsets ?: return safeInsetRect
+            val windowInsets = activity.window.decorView.rootWindowInsets ?: return safeInsetRectInternal
             val displayCutout = windowInsets.displayCutout
             if (displayCutout != null) {
-                safeInsetRect[displayCutout.safeInsetLeft, displayCutout.safeInsetTop, displayCutout.safeInsetRight] = displayCutout.safeInsetBottom
+                safeInsetRectInternal[displayCutout.safeInsetLeft, displayCutout.safeInsetTop, displayCutout.safeInsetRight] = displayCutout.safeInsetBottom
             }
-            return safeInsetRect
+            return safeInsetRectInternal
         }
     }
 
-    init {
-        mResources = mContext.resources
-        mWindowManager = mContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        mDisplayMetrics = DisplayMetrics()
-        mFloatingViewListener = listener
-        mFloatingViewRect = Rect()
-        mTrashViewRect = Rect()
-        mIsMoveAccept = false
-        mDisplayMode = DISPLAY_MODE_HIDE_FULLSCREEN
-        mSafeInsetRect = Rect()
-        mFloatingViewList = ArrayList()
-        mFullscreenObserverView = FullscreenObserverView(mContext, this)
-        mTrashView = TrashView(mContext)
-    }
 }

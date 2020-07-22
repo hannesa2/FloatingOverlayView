@@ -18,7 +18,7 @@ import info.hannes.floatingview.FloatingViewListener
 import info.hannes.floatingview.FloatingViewManager
 import timber.log.Timber
 
-class ChatHeadService : Service(), FloatingViewListener {
+class SimpleFloatingViewService : Service(), FloatingViewListener {
 
     private var floatingViewManager: FloatingViewManager? = null
 
@@ -35,7 +35,7 @@ class ChatHeadService : Service(), FloatingViewListener {
         val inflater = LayoutInflater.from(this)
 
         @SuppressLint("InflateParams")
-        val iconView = inflater.inflate(R.layout.widget_chathead, null, false) as ImageView
+        val iconView = inflater.inflate(R.layout.widget_simple, null, false) as ImageView
         iconView.setOnClickListener { Timber.d(getString(R.string.chathead_click_message)) }
         floatingViewManager = FloatingViewManager(this, this)
         floatingViewManager!!.setFixedTrashIconImage(R.drawable.ic_trash_fixed)

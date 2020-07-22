@@ -89,8 +89,8 @@ class FloatingViewControlFragment : Fragment() {
                 service = CustomFloatingViewService::class.java
                 key = CustomFloatingViewService.EXTRA_CUTOUT_SAFE_AREA
             } else {
-                service = ChatHeadService::class.java
-                key = ChatHeadService.EXTRA_CUTOUT_SAFE_AREA
+                service = SimpleFloatingViewService::class.java
+                key = SimpleFloatingViewService.EXTRA_CUTOUT_SAFE_AREA
             }
             val intent = Intent(activity, service)
             intent.putExtra(key, FloatingViewManager.findCutoutSafeArea(activity!!))
