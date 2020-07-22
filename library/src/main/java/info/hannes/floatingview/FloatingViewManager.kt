@@ -89,14 +89,14 @@ class FloatingViewManager(private val context: Context, listener: FloatingViewLi
         }
         moveAccept = false
         val state = targetFloatingView!!.state
-        if (state == FloatingView.STATE_NORMAL) {
+        if (state == FloatingViewState.STATE_NORMAL) {
             val size = floatingViewList.size
             for (i in 0 until size) {
                 val floatingView = floatingViewList[i]
                 floatingView.visibility = if (isFitSystemWindowTop) View.GONE else View.VISIBLE
             }
             trashView.dismiss()
-        } else if (state == FloatingView.STATE_INTERSECTING) {
+        } else if (state == FloatingViewState.STATE_INTERSECTING) {
             targetFloatingView!!.setFinishing()
             trashView.dismiss()
         }
@@ -118,7 +118,7 @@ class FloatingViewManager(private val context: Context, listener: FloatingViewLi
 
     override fun onTrashAnimationEnd(@TrashView.AnimationState animationCode: Int) {
         val state = targetFloatingView!!.state
-        if (state == FloatingView.STATE_FINISHING) {
+        if (state == FloatingViewState.STATE_FINISHING) {
             removeViewToWindow(targetFloatingView)
         }
         val size = floatingViewList.size
@@ -133,13 +133,14 @@ class FloatingViewManager(private val context: Context, listener: FloatingViewLi
         if (action != MotionEvent.ACTION_DOWN && !moveAccept) {
             return false
         }
+
         val state = targetFloatingView!!.state
         targetFloatingView = v as FloatingView
         if (action == MotionEvent.ACTION_DOWN) {
             moveAccept = true
         } else if (action == MotionEvent.ACTION_MOVE) {
             val isIntersecting = isIntersectWithTrash
-            val isIntersect = state == FloatingView.STATE_INTERSECTING
+            val isIntersect = state == FloatingViewState.STATE_INTERSECTING
             if (isIntersecting) {
                 targetFloatingView!!.setIntersecting(trashView.trashIconCenterX.toInt(), trashView.trashIconCenterY.toInt())
             }
@@ -151,18 +152,18 @@ class FloatingViewManager(private val context: Context, listener: FloatingViewLi
                 trashView.setScaleTrashIcon(false)
             }
         } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
-            if (state == FloatingView.STATE_INTERSECTING) {
+            if (state == FloatingViewState.STATE_INTERSECTING) {
                 targetFloatingView!!.setFinishing()
                 trashView.setScaleTrashIcon(false)
             }
             moveAccept = false
             if (floatingViewListener != null) {
-                val isFinishing = targetFloatingView!!.state == FloatingView.STATE_FINISHING
+                val isFinishing = targetFloatingView!!.state == FloatingViewState.STATE_FINISHING
                 val params = targetFloatingView!!.windowLayoutParams
                 floatingViewListener.onTouchFinished(isFinishing, params.x, params.y)
             }
         }
-        if (state == FloatingView.STATE_INTERSECTING) {
+        if (state == FloatingViewState.STATE_INTERSECTING) {
             trashView.onTouchFloatingView(event, floatingViewRect.left.toFloat(), floatingViewRect.top.toFloat())
         } else {
             val params = targetFloatingView!!.windowLayoutParams
