@@ -37,13 +37,16 @@ class SimpleFloatingViewService : Service(), FloatingViewListener {
         @SuppressLint("InflateParams")
         val iconView = inflater.inflate(R.layout.widget_simple, null, false) as ImageView
         iconView.setOnClickListener { Timber.d(getString(R.string.chathead_click_message)) }
-        floatingViewManager = FloatingViewManager(this, this)
-        floatingViewManager!!.setFixedTrashIconImage(R.drawable.ic_trash_fixed)
-        floatingViewManager!!.setActionTrashIconImage(R.drawable.ic_trash_action)
-        floatingViewManager!!.setSafeInsetRect(intent.getParcelableExtra<Parcelable>(EXTRA_CUTOUT_SAFE_AREA) as Rect)
+
         val options = FloatingViewManager.Options()
         options.overMargin = (16 * metrics.density).toInt()
-        floatingViewManager!!.addViewToWindow(iconView, options)
+
+        floatingViewManager = FloatingViewManager(this, this).apply {
+            setFixedTrashIconImage(R.drawable.ic_trash_fixed)
+            setActionTrashIconImage(R.drawable.ic_trash_action)
+            setSafeInsetRect(intent.getParcelableExtra<Parcelable>(EXTRA_CUTOUT_SAFE_AREA) as Rect)
+            addViewToWindow(iconView, options)
+        }
 
         startForeground(NOTIFICATION_ID, createNotification(this))
         return START_REDELIVER_INTENT
