@@ -70,7 +70,7 @@ class SimpleFloatingViewService : Service(), FloatingViewListener {
         if (isFinishing) {
             Timber.d(getString(R.string.deleted_soon))
         } else {
-            Timber.d(getString(R.string.touch_finished_position, x, y))
+            Timber.d("Current position $x $y")
         }
     }
 
@@ -81,7 +81,7 @@ class SimpleFloatingViewService : Service(), FloatingViewListener {
 
     companion object {
         const val EXTRA_CUTOUT_SAFE_AREA = "cutout_safe_area"
-        private const val NOTIFICATION_ID = 9083150
+        private const val NOTIFICATION_ID = 9083199
         private fun createNotification(context: Context): Notification {
             val builder = NotificationCompat.Builder(context, context.getString(R.string.default_floatingview_channel_id))
             builder.setWhen(System.currentTimeMillis())

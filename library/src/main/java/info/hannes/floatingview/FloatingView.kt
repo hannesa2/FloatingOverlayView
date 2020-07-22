@@ -440,7 +440,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
         }
 
         // Lazy execution of moveToEdge
-        if (isWaitForMoveToEdge && animationHandler.state != STATE_FINISHING) {
+        if (isWaitForMoveToEdge && animationHandler.state != FloatingViewState.STATE_FINISHING) {
             // include device rotation
             moveToEdge(true)
             if (velocityTracker != null) {
@@ -813,22 +813,22 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
         get() = (metrics.heightPixels + navigationBarVerticalOffset - (screenTouchY - localTouchY + height - touchYOffset)).toInt()
 
     fun setNormal() {
-        animationHandler.state = STATE_NORMAL
+        animationHandler.state = FloatingViewState.STATE_NORMAL
         animationHandler.updateTouchPosition(xByTouch.toFloat(), yByTouch.toFloat())
     }
 
     fun setIntersecting(centerX: Int, centerY: Int) {
-        animationHandler.state = STATE_INTERSECTING
+        animationHandler.state = FloatingViewState.STATE_INTERSECTING
         animationHandler.updateTargetPosition(centerX.toFloat(), centerY.toFloat())
     }
 
     fun setFinishing() {
-        animationHandler.state = STATE_FINISHING
+        animationHandler.state = FloatingViewState.STATE_FINISHING
         moveAccept = false
         visibility = View.GONE
     }
 
-    val state: Int
+    val state: FloatingViewState
         get() = animationHandler.state
 
     /**
@@ -839,13 +839,13 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
     }
 
     internal class FloatingAnimationHandler(floatingView: FloatingView) : Handler() {
-        private var mStartTime: Long = 0
-        private var mStartX = 0f
-        private var mStartY = 0f
-        private var mState: Int
+        private var startTime: Long = 0
+        private var startX = 0f
+        private var startY = 0f
+        private var mState: FloatingViewState
         private var mIsChangeState = false
-        private var mTouchPositionX = 0f
-        private var mTouchPositionY = 0f
+        private var touchPositionX = 0f
+        private var touchPositionY = 0f
         private var mTargetPositionX = 0f
         private var mTargetPositionY = 0f
         private val mFloatingView: WeakReference<FloatingView> = WeakReference(floatingView)
@@ -859,28 +859,28 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
             val animationType = msg.arg1
             val params = floatingView.windowLayoutParams
             if (mIsChangeState || animationType == TYPE_FIRST) {
-                mStartTime = if (mIsChangeState) SystemClock.uptimeMillis() else 0
-                mStartX = params.x.toFloat()
-                mStartY = params.y.toFloat()
+                startTime = if (mIsChangeState) SystemClock.uptimeMillis() else 0
+                startX = params.x.toFloat()
+                startY = params.y.toFloat()
                 mIsChangeState = false
             }
-            val elapsedTime = SystemClock.uptimeMillis() - mStartTime.toFloat()
+            val elapsedTime = SystemClock.uptimeMillis() - startTime.toFloat()
             val trackingTargetTimeRate = Math.min(elapsedTime / CAPTURE_DURATION_MILLIS, 1.0f)
-            if (mState == STATE_NORMAL) {
+            if (mState == FloatingViewState.STATE_NORMAL) {
                 val basePosition = calcAnimationPosition(trackingTargetTimeRate)
                 val moveLimitRect = floatingView.moveLimitRect1
-                val targetPositionX = Math.min(Math.max(moveLimitRect.left, mTouchPositionX.toInt()), moveLimitRect.right).toFloat()
-                val targetPositionY = Math.min(Math.max(moveLimitRect.top, mTouchPositionY.toInt()), moveLimitRect.bottom).toFloat()
-                params.x = (mStartX + (targetPositionX - mStartX) * basePosition).toInt()
-                params.y = (mStartY + (targetPositionY - mStartY) * basePosition).toInt()
+                val targetPositionX = Math.min(Math.max(moveLimitRect.left, touchPositionX.toInt()), moveLimitRect.right).toFloat()
+                val targetPositionY = Math.min(Math.max(moveLimitRect.top, touchPositionY.toInt()), moveLimitRect.bottom).toFloat()
+                params.x = (startX + (targetPositionX - startX) * basePosition).toInt()
+                params.y = (startY + (targetPositionY - startY) * basePosition).toInt()
                 floatingView.updateViewLayout()
                 sendMessageAtTime(newMessage(animationCode, TYPE_UPDATE), SystemClock.uptimeMillis() + ANIMATION_REFRESH_TIME_MILLIS)
-            } else if (mState == STATE_INTERSECTING) {
+            } else if (mState == FloatingViewState.STATE_INTERSECTING) {
                 val basePosition = calcAnimationPosition(trackingTargetTimeRate)
                 val targetPositionX = mTargetPositionX - floatingView.width / 2
                 val targetPositionY = mTargetPositionY - floatingView.height / 2
-                params.x = (mStartX + (targetPositionX - mStartX) * basePosition).toInt()
-                params.y = (mStartY + (targetPositionY - mStartY) * basePosition).toInt()
+                params.x = (startX + (targetPositionX - startX) * basePosition).toInt()
+                params.y = (startY + (targetPositionY - startY) * basePosition).toInt()
                 floatingView.updateViewLayout()
                 sendMessageAtTime(newMessage(animationCode, TYPE_UPDATE), SystemClock.uptimeMillis() + ANIMATION_REFRESH_TIME_MILLIS)
             }
@@ -895,8 +895,8 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
         }
 
         fun updateTouchPosition(positionX: Float, positionY: Float) {
-            mTouchPositionX = positionX
-            mTouchPositionY = positionY
+            touchPositionX = positionX
+            touchPositionY = positionY
         }
 
         fun updateTargetPosition(centerX: Float, centerY: Float) {
@@ -904,7 +904,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
             mTargetPositionY = centerY
         }
 
-        var state: Int
+        var state: FloatingViewState
             get() = mState
             set(newState) {
                 if (mState != newState) {
@@ -942,12 +942,12 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
         }
 
         init {
-            mState = STATE_NORMAL
+            mState = FloatingViewState.STATE_NORMAL
         }
     }
 
     internal class LongPressHandler(view: FloatingView) : Handler() {
-        private val mFloatingView: WeakReference<FloatingView>
+        private val mFloatingView: WeakReference<FloatingView> = WeakReference(view)
         override fun handleMessage(msg: Message) {
             val view = mFloatingView.get()
             if (view == null) {
@@ -961,9 +961,6 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
             const val LONG_PRESSED = 0
         }
 
-        init {
-            mFloatingView = WeakReference(view)
-        }
     }
 
     companion object {
@@ -976,9 +973,6 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
         private const val ANIMATION_FLING_X_FRICTION = 1.7f
         private const val ANIMATION_FLING_Y_FRICTION = 1.7f
         private const val CURRENT_VELOCITY_UNITS = 1000
-        const val STATE_NORMAL = 0
-        const val STATE_INTERSECTING = 1
-        const val STATE_FINISHING = 2
         private val LONG_PRESS_TIMEOUT = (1.5f * ViewConfiguration.getLongPressTimeout()).toInt()
         private const val MAX_X_VELOCITY_SCALE_DOWN_VALUE = 9f
         private const val MAX_Y_VELOCITY_SCALE_DOWN_VALUE = 8f
