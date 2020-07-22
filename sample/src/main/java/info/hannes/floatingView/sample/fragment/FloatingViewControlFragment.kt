@@ -17,20 +17,22 @@ import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import info.hannes.floatingView.sample.R
-import info.hannes.floatingView.sample.service.ChatHeadService
+import info.hannes.floatingView.sample.service.SimpleFloatingViewService
 import info.hannes.floatingView.sample.service.CustomFloatingViewService
 import info.hannes.floatingview.FloatingViewManager
+import kotlinx.android.synthetic.main.fragment_floating_view_control.*
 
 class FloatingViewControlFragment : Fragment() {
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_floating_view_control, container, false)
-        rootView.findViewById<View>(R.id.show_demo).setOnClickListener {
+        show_demo.setOnClickListener {
             showFloatingView(activity, true, false)
         }
-        rootView.findViewById<View>(R.id.show_customized_demo).setOnClickListener {
+        show_customized_demo.setOnClickListener {
             showFloatingView(activity, true, true)
         }
-        rootView.findViewById<View>(R.id.show_settings).setOnClickListener {
+        show_settings.setOnClickListener {
             val ft = fragmentManager!!.beginTransaction()
             ft.replace(R.id.container, FloatingViewSettingsFragment.newInstance())
             ft.addToBackStack(null)
