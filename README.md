@@ -72,7 +72,7 @@ Describe the process (`onFinishFloatingView`) that is called when you exit the F
         ...
         <!-- Demo -->
         <service
-            android:name="jp.co.recruit_lifestyle.sample.service.ChatHeadService"
+            android:name="info.hannes.floatingView.sample.service.ChatHeadService"
             android:exported="false"/>
         ...
     </application>

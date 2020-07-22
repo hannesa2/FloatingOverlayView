@@ -4,7 +4,7 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion 29
     defaultConfig {
-        applicationId "jp.co.recruit.floatingview"
+        applicationId "info.hannes.floatingView.sample"
         minSdkVersion 16
         targetSdkVersion 29
         versionCode 1
