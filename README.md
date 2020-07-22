@@ -2,7 +2,7 @@
 [Archived] Use instead: https://developer.android.com/guide/topics/ui/bubbles
 
 The Android project is View to display information such as chat in front.
-To API Level 14 or higher are supported
+To API Level 16 or higher are supported
 
 ## Screenshots
 ![](./screenshot/animation.gif)  
@@ -15,7 +15,7 @@ To API Level 14 or higher are supported
 
 ## Requirements
 Target Sdk Version : 28  
-Min Sdk Version : 14  
+Min Sdk Version : 16  
 
 ## How to use
 1) Add this to your **build.gradle**.
