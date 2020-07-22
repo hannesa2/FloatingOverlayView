@@ -114,23 +114,18 @@ class CustomFloatingViewService : Service(), FloatingViewListener {
         }
 
         // Margin
-        val marginSettings = sharedPref.getString("settings_margin", options.overMargin.toString())
-        options.overMargin = marginSettings!!.toInt()
+        options.overMargin = sharedPref.getInt("settings_margin", options.overMargin)
+        options.overMarginX = sharedPref.getInt("settings_marginX", options.overMarginX)
+        options.overMarginY = sharedPref.getInt("settings_marginY", options.overMarginY)
 
         // MoveDirection
-        val moveDirectionSettings = sharedPref.getString("settings_move_direction", "")
-        if ("Default" == moveDirectionSettings) {
-            options.moveDirection = FloatingViewManager.MOVE_DIRECTION_DEFAULT
-        } else if ("Left" == moveDirectionSettings) {
-            options.moveDirection = FloatingViewManager.MOVE_DIRECTION_LEFT
-        } else if ("Right" == moveDirectionSettings) {
-            options.moveDirection = FloatingViewManager.MOVE_DIRECTION_RIGHT
-        } else if ("Nearest" == moveDirectionSettings) {
-            options.moveDirection = FloatingViewManager.MOVE_DIRECTION_NEAREST
-        } else if ("Fix" == moveDirectionSettings) {
-            options.moveDirection = FloatingViewManager.MOVE_DIRECTION_NONE
-        } else if ("Thrown" == moveDirectionSettings) {
-            options.moveDirection = FloatingViewManager.MOVE_DIRECTION_THROWN
+        when (sharedPref.getString("settings_move_direction", "")) {
+            "Default" -> options.moveDirection = FloatingViewManager.MOVE_DIRECTION_DEFAULT
+            "Left" -> options.moveDirection = FloatingViewManager.MOVE_DIRECTION_LEFT
+            "Right" -> options.moveDirection = FloatingViewManager.MOVE_DIRECTION_RIGHT
+            "Nearest" -> options.moveDirection = FloatingViewManager.MOVE_DIRECTION_NEAREST
+            "Fix" -> options.moveDirection = FloatingViewManager.MOVE_DIRECTION_NONE
+            "Thrown" -> options.moveDirection = FloatingViewManager.MOVE_DIRECTION_THROWN
         }
         options.usePhysics = sharedPref.getBoolean("settings_use_physics", true)
 

@@ -25,6 +25,23 @@
         android:summary="%s"
         android:title="@string/settings_title_margin" />
 
+
+    <ListPreference
+        android:defaultValue="0"
+        android:entries="@array/settings_entries_margin"
+        android:entryValues="@array/settings_values_margin"
+        android:key="settings_marginX"
+        android:summary="%s"
+        android:title="@string/settings_title_marginX" />
+
+    <ListPreference
+        android:defaultValue="0"
+        android:entries="@array/settings_entries_margin"
+        android:entryValues="@array/settings_values_margin"
+        android:key="settings_marginY"
+        android:summary="%s"
+        android:title="@string/settings_title_marginY" />
+
     <ListPreference
         android:defaultValue="Default"
         android:entries="@array/settings_entries_move_direction"

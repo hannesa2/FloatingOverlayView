@@ -71,6 +71,8 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
     private val animationHandler: FloatingAnimationHandler
     private val longPressHandler: LongPressHandler
     private var overMargin = 0
+    private var overMarginX = 0
+    private var overMarginY = 0
     private var onTouchListener: OnTouchListener? = null
     private var longPressed = false
     private var moveDirection: Int
@@ -313,7 +315,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
         val newScreenWidth = metrics.widthPixels
         val newScreenHeight = metrics.heightPixels
         moveLimitRect1[-width, -height * 2, newScreenWidth + width + navigationBarHorizontalOffset] = newScreenHeight + height + navigationBarVerticalOffset
-        positionLimitRect[-overMargin, 0, newScreenWidth - width + overMargin + navigationBarHorizontalOffset] = newScreenHeight - statusBarHeight - height + navigationBarVerticalOffset
+        positionLimitRect[-overMargin - overMarginX, 0, newScreenWidth - width + overMargin + overMarginY + navigationBarHorizontalOffset] = newScreenHeight - statusBarHeight - height + navigationBarVerticalOffset
 
         // Initial animation stop when the device rotates
         val newRotation = windowManager.defaultDisplay.rotation
@@ -775,6 +777,14 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
 
     fun setOverMargin(margin: Int) {
         overMargin = margin
+    }
+
+    fun setOverMarginX(margin: Int) {
+        overMarginX = margin
+    }
+
+    fun setOverMarginY(margin: Int) {
+        overMarginY = margin
     }
 
     fun setMoveDirection(moveDirectionVal: Int) {
