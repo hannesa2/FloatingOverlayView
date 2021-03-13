@@ -159,8 +159,8 @@ It can be set only when displaying for the first time
 It can be set any time  
   
 ```java
-mFloatingViewManager.setFixedTrashIconImage(R.drawable.ic_trash_fixed);
-mFloatingViewManager.setActionTrashIconImage(R.drawable.ic_trash_action);
+floatingViewManager.setFixedTrashIconImage(R.drawable.ic_trash_fixed);
+floatingViewManager.setActionTrashIconImage(R.drawable.ic_trash_action);
 ```
 
 |Option|Description|
@@ -172,7 +172,7 @@ mFloatingViewManager.setActionTrashIconImage(R.drawable.ic_trash_action);
 
 # License
 
-    Copyright 2020 hannesa2
+    Copyright 2021 hannesa2
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
