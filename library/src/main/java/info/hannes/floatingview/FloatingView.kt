@@ -845,7 +845,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
     /**
      * Set the cutout's safe inset area
      */
-    fun setSafeInsetRect(safeInsetRectVal: Rect?) {
+    fun setSafeInsetRect(safeInsetRectVal: Rect) {
         safeInsetRect.set(safeInsetRectVal)
     }
 
