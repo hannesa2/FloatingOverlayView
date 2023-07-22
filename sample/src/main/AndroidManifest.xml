@@ -2,6 +2,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Foreground Service permission(API level 28 or higher) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
         android:name="info.hannes.floatingView.sample.LoggingApplication"
@@ -13,7 +16,6 @@
 
         <activity
             android:name="info.hannes.floatingView.sample.MainActivity"
-            android:label="@string/app_name"
             android:screenOrientation="fullSensor"
             android:exported="true">
             <intent-filter>
@@ -34,9 +36,5 @@
             android:exported="false" />
 
     </application>
-    <!-- Foreground Service permission(API level 28 or higher) -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
 </manifest>
