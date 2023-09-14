@@ -18,7 +18,6 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
     api 'com.github.AppDevNext.Logcat:LogcatCoreLib:2.14'
-    implementation "androidx.core:core-ktx:1.9.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
