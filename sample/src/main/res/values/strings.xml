@@ -16,4 +16,5 @@
     <string name="finish_deleted">FloatingView has been deleted.</string>
     <string name="default_floatingview_channel_id">default_floatingview_channel</string>
     <string name="default_floatingview_channel_name">Default Channel</string>
+    <string name="settings_summary_docking">Dock to border</string>
 </resources>

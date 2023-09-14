@@ -236,7 +236,7 @@ class FloatingViewManager(private val context: Context, listener: FloatingViewLi
     fun addViewToWindow(view: View, options: Options) {
         val isFirstAttach = floatingViewList.isEmpty()
         // FloatingView
-        val floatingView = FloatingView(context)
+        val floatingView = FloatingView(context, options.docking)
         floatingView.setInitCoords(options.floatingViewX, options.floatingViewY)
         floatingView.setOnTouchListener(this)
         floatingView.shape = options.shape
@@ -315,6 +315,7 @@ class FloatingViewManager(private val context: Context, listener: FloatingViewLi
          */
         var usePhysics: Boolean = true
         var animateInitialMove: Boolean = true
+        var docking: Boolean = true
     }
 
     companion object {
