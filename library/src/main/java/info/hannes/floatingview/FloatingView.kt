@@ -846,7 +846,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
         safeInsetRect.set(safeInsetRectVal)
     }
 
-    internal class FloatingAnimationHandler(floatingView: FloatingView) : Handler() {
+    internal class FloatingAnimationHandler(floatingView: FloatingView) : Handler(Looper.getMainLooper()) {
         private var startTime: Long = 0
         private var startX = 0f
         private var startY = 0f
@@ -954,7 +954,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
         }
     }
 
-    internal class LongPressHandler(view: FloatingView) : Handler() {
+    internal class LongPressHandler(view: FloatingView) : Handler(Looper.getMainLooper()) {
         private val mFloatingView: WeakReference<FloatingView> = WeakReference(view)
         override fun handleMessage(msg: Message) {
             val view = mFloatingView.get()
