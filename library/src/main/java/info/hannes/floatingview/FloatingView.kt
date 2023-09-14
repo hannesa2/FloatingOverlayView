@@ -15,6 +15,7 @@ import android.widget.FrameLayout
 import androidx.core.view.ViewCompat
 import androidx.dynamicanimation.animation.*
 import androidx.dynamicanimation.animation.DynamicAnimation.OnAnimationUpdateListener
+import timber.log.Timber
 import java.lang.ref.WeakReference
 import kotlin.math.*
 
@@ -452,6 +453,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
     }
 
     private fun addMovement(event: MotionEvent) {
+        Timber.d("()")
         val deltaX = event.rawX - event.x
         val deltaY = event.rawY - event.y
         event.offsetLocation(deltaX, deltaY)
@@ -485,18 +487,21 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
     }
 
     private fun moveToEdge(withAnimation: Boolean) {
+        Timber.d("() withAnimation=$withAnimation")
         val currentX = xByTouch
         val currentY = yByTouch
         moveToEdge(currentX, currentY, withAnimation)
     }
 
     private fun moveToEdge(startX: Int, startY: Int, withAnimation: Boolean) {
+        Timber.d("() startX:$startX startY=$startY withAnimation=$withAnimation")
         val goalPositionX = getGoalPositionX(startX, startY)
         val goalPositionY = getGoalPositionY(startX, startY)
         moveTo(startX, startY, goalPositionX, goalPositionY, withAnimation)
     }
 
     private fun moveTo(currentX: Int, currentY: Int, goalPositionXVal: Int, goalPositionYVal: Int, withAnimation: Boolean) {
+        Timber.d("()")
         var goalPositionX = goalPositionXVal
         var goalPositionY = goalPositionYVal
         goalPositionX = min(max(positionLimitRect.left, goalPositionX), positionLimitRect.right)
@@ -530,6 +535,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
      * @param currentY      current Y coordinate
      */
     private fun startPhysicsAnimation(goalPositionX: Int, currentY: Int) {
+        Timber.d("()")
         // start X coordinate animation
         val containsLimitRectWidth = windowLayoutParams.x < positionLimitRect.right && windowLayoutParams.x > positionLimitRect.left
         // If MOVE_DIRECTION_NONE, play fling animation
@@ -551,6 +557,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
     }
 
     private fun startObjectAnimation(currentX: Int, currentY: Int, goalPositionX: Int, goalPositionY: Int) {
+        Timber.d("()")
         if (goalPositionX == currentX) {
             //to move only y coord
             moveEdgeAnimator = ValueAnimator.ofInt(currentY, goalPositionY)
@@ -577,6 +584,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
     }
 
     private fun startSpringAnimationX(goalPositionX: Int) {
+        Timber.d("()")
         // springX
         val springX = SpringForce(goalPositionX.toFloat())
         springX.dampingRatio = ANIMATION_SPRING_X_DAMPING_RATIO
@@ -601,6 +609,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
     }
 
     private fun startSpringAnimationY(currentY: Int, velocityY: Float) {
+        Timber.d("()")
         // Create SpringForce
         val springY = SpringForce(if (currentY < metrics.heightPixels / 2) positionLimitRect.top.toFloat() else positionLimitRect.bottom.toFloat())
         springY.dampingRatio = SpringForce.DAMPING_RATIO_LOW_BOUNCY
@@ -626,6 +635,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
     }
 
     private fun startFlingAnimationX(velocityX: Float) {
+        Timber.d("()")
         val flingAnimationX = FlingAnimation(FloatValueHolder())
         flingAnimationX.setStartVelocity(velocityX)
         flingAnimationX.setMaxValue(positionLimitRect.right.toFloat())
@@ -647,6 +657,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
     }
 
     private fun startFlingAnimationY(velocityY: Float) {
+        Timber.d("()")
         val flingAnimationY = FlingAnimation(FloatValueHolder())
         flingAnimationY.setStartVelocity(velocityY)
         flingAnimationY.setMaxValue(positionLimitRect.bottom.toFloat())
@@ -749,6 +760,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
     }
 
     private fun cancelAnimation() {
+        Timber.d("()")
         if (moveEdgeAnimator != null && moveEdgeAnimator!!.isStarted) {
             moveEdgeAnimator!!.cancel()
             moveEdgeAnimator = null
@@ -756,6 +768,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
     }
 
     private fun setScale(newScale: Float) {
+        Timber.d("()")
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
             val childCount = childCount
             for (i in 0 until childCount) {
@@ -770,22 +783,27 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
     }
 
     fun setDraggable(isDraggable: Boolean) {
+        Timber.d("()")
         draggable = isDraggable
     }
 
     fun setOverMargin(margin: Int) {
+        Timber.d("()")
         overMargin = margin
     }
 
     fun setOverMarginX(margin: Int) {
+        Timber.d("()")
         overMarginX = margin
     }
 
     fun setOverMarginY(margin: Int) {
+        Timber.d("()")
         overMarginY = margin
     }
 
     fun setMoveDirection(moveDirectionVal: Int) {
+        Timber.d("()")
         moveDirection = moveDirectionVal
     }
 
@@ -796,15 +814,18 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
      * @param usePhysicsVal Setting this to false will revert to using a ValueAnimator (default is true)
      */
     fun usePhysics(usePhysicsVal: Boolean) {
-        usePhysics = usePhysicsVal && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
+        Timber.d("()")
+        usePhysics = usePhysicsVal
     }
 
     fun setInitCoords(x: Int, y: Int) {
+        Timber.d("()")
         initX = x
         initY = y
     }
 
     fun setAnimateInitialMove(animateInitialMove: Boolean) {
+        Timber.d("()")
         this.animateInitialMove = animateInitialMove
     }
 
@@ -821,16 +842,19 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
         get() = (metrics.heightPixels + navigationBarVerticalOffset - (screenTouchY - localTouchY + height - touchYOffset)).toInt()
 
     fun setNormal() {
+        Timber.d("()")
         animationHandler.state = FloatingViewState.STATE_NORMAL
         animationHandler.updateTouchPosition(xByTouch.toFloat(), yByTouch.toFloat())
     }
 
     fun setIntersecting(centerX: Int, centerY: Int) {
+        Timber.d("()")
         animationHandler.state = FloatingViewState.STATE_INTERSECTING
         animationHandler.updateTargetPosition(centerX.toFloat(), centerY.toFloat())
     }
 
     fun setFinishing() {
+        Timber.d("()")
         animationHandler.state = FloatingViewState.STATE_FINISHING
         moveAccept = false
         visibility = View.GONE

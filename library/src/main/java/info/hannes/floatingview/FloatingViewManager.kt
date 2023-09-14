@@ -16,6 +16,7 @@ import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.IntDef
+import timber.log.Timber
 import java.util.*
 
 class FloatingViewManager(private val context: Context, listener: FloatingViewListener?) : ScreenChangedListener, OnTouchListener, TrashViewListener {
@@ -159,6 +160,7 @@ class FloatingViewManager(private val context: Context, listener: FloatingViewLi
             if (floatingViewListener != null) {
                 val isFinishing = targetFloatingView!!.state == FloatingViewState.STATE_FINISHING
                 val params = targetFloatingView!!.windowLayoutParams
+                Timber.d(params.toString())
                 floatingViewListener.onTouchFinished(isFinishing, params.x, params.y)
             }
         }
