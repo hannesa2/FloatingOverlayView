@@ -1,5 +1,4 @@
-<manifest package="info.hannes.floatingView.sample"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Foreground Service permission(API level 28 or higher) -->
