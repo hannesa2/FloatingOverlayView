@@ -114,9 +114,9 @@ class CustomFloatingViewService : Service(), FloatingViewListener {
         }
 
         // Margin
-        options.overMargin = sharedPref.getInt("settings_margin", options.overMargin)
-        options.overMarginX = sharedPref.getInt("settings_marginX", options.overMarginX)
-        options.overMarginY = sharedPref.getInt("settings_marginY", options.overMarginY)
+//        options.overMargin = sharedPref.getInt("settings_margin", options.overMargin)
+//        options.overMarginX = sharedPref.getInt("settings_marginX", options.overMarginX)
+//        options.overMarginY = sharedPref.getInt("settings_marginY", options.overMarginY)
 
         // MoveDirection
         when (sharedPref.getString("settings_move_direction", "")) {
