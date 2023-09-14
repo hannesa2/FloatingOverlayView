@@ -17,26 +17,36 @@ import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import info.hannes.floatingView.sample.R
+import info.hannes.floatingView.sample.databinding.FragmentFloatingViewControlBinding
 import info.hannes.floatingView.sample.service.SimpleFloatingViewService
 import info.hannes.floatingView.sample.service.CustomFloatingViewService
 import info.hannes.floatingview.FloatingViewManager
-import kotlinx.android.synthetic.main.fragment_floating_view_control.*
 
 class FloatingViewControlFragment : Fragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_floating_view_control, container, false)
+    private var _binding: FragmentFloatingViewControlBinding? = null
+    private val binding get() = _binding!!
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentFloatingViewControlBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        show_demo.setOnClickListener {
+        binding.showDemo.setOnClickListener {
             showFloatingView(activity, true, false)
         }
-        show_customized_demo.setOnClickListener {
+        binding.showCustomizedDemo.setOnClickListener {
             showFloatingView(activity, true, true)
         }
-        show_settings.setOnClickListener {
+        binding.showSettings.setOnClickListener {
             val ft = fragmentManager!!.beginTransaction()
             ft.replace(R.id.container, FloatingViewSettingsFragment.newInstance())
             ft.addToBackStack(null)

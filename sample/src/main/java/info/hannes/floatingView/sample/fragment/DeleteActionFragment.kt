@@ -7,19 +7,28 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import info.hannes.floatingView.sample.R
+import info.hannes.floatingView.sample.databinding.FragmentDeleteActionBinding
 import info.hannes.floatingView.sample.service.CustomFloatingViewService
-import kotlinx.android.synthetic.main.fragment_delete_action.*
 
 class DeleteActionFragment : Fragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_delete_action, container, false)
-        clearDemo.setOnClickListener { // Easy way to delete a service
+    private var _binding: FragmentDeleteActionBinding? = null
+    private val binding get() = _binding!!
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentDeleteActionBinding.inflate(inflater, container, false)
+        val view = binding.root
+
+        binding.clearDemo.setOnClickListener { // Easy way to delete a service
             val activity: Activity? = activity
             activity!!.stopService(Intent(activity, CustomFloatingViewService::class.java))
         }
-        return rootView
+        return view
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {
