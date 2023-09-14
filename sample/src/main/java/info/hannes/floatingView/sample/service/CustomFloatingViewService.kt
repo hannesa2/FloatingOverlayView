@@ -113,6 +113,7 @@ class CustomFloatingViewService : Service(), FloatingViewListener {
             options.shape = FloatingViewManager.SHAPE_RECTANGLE
         }
 
+        options.docking = sharedPref.getBoolean("settings_docking", options.docking)
         // Margin
 //        options.overMargin = sharedPref.getInt("settings_margin", options.overMargin)
 //        options.overMarginX = sharedPref.getInt("settings_marginX", options.overMarginX)

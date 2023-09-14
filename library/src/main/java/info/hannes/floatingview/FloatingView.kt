@@ -22,7 +22,7 @@ import kotlin.math.*
 /**
  * http://stackoverflow.com/questions/18503050/how-to-create-draggabble-system-alert-in-android
  */
-internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeObserver.OnPreDrawListener {
+internal class FloatingView(context: Context, val docking: Boolean) : FrameLayout(context), ViewTreeObserver.OnPreDrawListener {
 
     private val windowManager: WindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     val windowLayoutParams: WindowManager.LayoutParams = WindowManager.LayoutParams()
@@ -443,7 +443,8 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
         // Lazy execution of moveToEdge
         if (isWaitForMoveToEdge && animationHandler.state != FloatingViewState.STATE_FINISHING) {
             // include device rotation
-            moveToEdge(true)
+            if (docking)
+                moveToEdge(true)
             if (velocityTracker != null) {
                 velocityTracker!!.recycle()
                 velocityTracker = null

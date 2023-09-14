@@ -2,6 +2,7 @@
 <resources>
     <string name="settings_title_shape">Shape</string>
     <string name="settings_title_display_mode">Display Mode</string>
+    <string name="settings_title_docking">Docking</string>
     <string name="settings_title_margin">Margin</string>
     <string name="settings_title_marginX">Margin X</string>
     <string name="settings_title_marginY">Margin Y</string>
