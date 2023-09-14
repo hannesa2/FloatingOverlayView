@@ -7,10 +7,7 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.PixelFormat
 import android.graphics.Rect
-import android.os.Build
-import android.os.Handler
-import android.os.Message
-import android.os.SystemClock
+import android.os.*
 import android.util.DisplayMetrics
 import android.view.*
 import android.view.animation.OvershootInterpolator
@@ -19,7 +16,7 @@ import androidx.core.view.ViewCompat
 import androidx.dynamicanimation.animation.*
 import androidx.dynamicanimation.animation.DynamicAnimation.OnAnimationUpdateListener
 import java.lang.ref.WeakReference
-import kotlin.math.min
+import kotlin.math.*
 
 /**
  * http://stackoverflow.com/questions/18503050/how-to-create-draggabble-system-alert-in-android
@@ -502,8 +499,8 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
     private fun moveTo(currentX: Int, currentY: Int, goalPositionXVal: Int, goalPositionYVal: Int, withAnimation: Boolean) {
         var goalPositionX = goalPositionXVal
         var goalPositionY = goalPositionYVal
-        goalPositionX = Math.min(Math.max(positionLimitRect.left, goalPositionX), positionLimitRect.right)
-        goalPositionY = Math.min(Math.max(positionLimitRect.top, goalPositionY), positionLimitRect.bottom)
+        goalPositionX = min(max(positionLimitRect.left, goalPositionX), positionLimitRect.right)
+        goalPositionY = min(max(positionLimitRect.top, goalPositionY), positionLimitRect.bottom)
         if (withAnimation) {
             // Use physics animation
             val usePhysicsAnimation = usePhysics && velocityTracker != null && moveDirection != FloatingViewManager.MOVE_DIRECTION_NEAREST
@@ -537,7 +534,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
         val containsLimitRectWidth = windowLayoutParams.x < positionLimitRect.right && windowLayoutParams.x > positionLimitRect.left
         // If MOVE_DIRECTION_NONE, play fling animation
         if (moveDirection == FloatingViewManager.MOVE_DIRECTION_NONE && containsLimitRectWidth) {
-            val velocityX = Math.min(Math.max(velocityTracker!!.xVelocity, -maximumXVelocity), maximumXVelocity)
+            val velocityX = min(max(velocityTracker!!.xVelocity, -maximumXVelocity), maximumXVelocity)
             startFlingAnimationX(velocityX)
         } else {
             startSpringAnimationX(goalPositionX)
@@ -545,7 +542,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
 
         // start Y coordinate animation
         val containsLimitRectHeight = windowLayoutParams.y < positionLimitRect.bottom && windowLayoutParams.y > positionLimitRect.top
-        val velocityY = -Math.min(Math.max(velocityTracker!!.yVelocity, -maximumYVelocity), maximumYVelocity)
+        val velocityY = -min(max(velocityTracker!!.yVelocity, -maximumYVelocity), maximumYVelocity)
         if (containsLimitRectHeight) {
             startFlingAnimationY(velocityY)
         } else {
@@ -591,7 +588,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
         springAnimationX.spring = springX
         springAnimationX.minimumVisibleChange = DynamicAnimation.MIN_VISIBLE_CHANGE_PIXELS
         springAnimationX.addUpdateListener(OnAnimationUpdateListener { animation, value, velocity ->
-            val x = Math.round(value)
+            val x = value.roundToInt()
             // Not moving, or the touch operation is continuing
             if (windowLayoutParams.x == x || velocityTracker != null) {
                 return@OnAnimationUpdateListener
@@ -616,7 +613,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
         springAnimationY.spring = springY
         springAnimationY.minimumVisibleChange = DynamicAnimation.MIN_VISIBLE_CHANGE_PIXELS
         springAnimationY.addUpdateListener(OnAnimationUpdateListener { animation, value, velocity ->
-            val y = Math.round(value)
+            val y = value.roundToInt()
             // Not moving, or the touch operation is continuing
             if (windowLayoutParams.y == y || velocityTracker != null) {
                 return@OnAnimationUpdateListener
@@ -637,7 +634,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
         flingAnimationX.friction = ANIMATION_FLING_X_FRICTION
         flingAnimationX.minimumVisibleChange = DynamicAnimation.MIN_VISIBLE_CHANGE_PIXELS
         flingAnimationX.addUpdateListener(OnAnimationUpdateListener { animation, value, velocity ->
-            val x = Math.round(value)
+            val x = value.roundToInt()
             // Not moving, or the touch operation is continuing
             if (windowLayoutParams.x == x || velocityTracker != null) {
                 return@OnAnimationUpdateListener
@@ -658,7 +655,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
         flingAnimationY.friction = ANIMATION_FLING_Y_FRICTION
         flingAnimationY.minimumVisibleChange = DynamicAnimation.MIN_VISIBLE_CHANGE_PIXELS
         flingAnimationY.addUpdateListener(OnAnimationUpdateListener { animation, value, velocity ->
-            val y = Math.round(value)
+            val y = value.roundToInt()
             // Not moving, or the touch operation is continuing
             if (windowLayoutParams.y == y || velocityTracker != null) {
                 return@OnAnimationUpdateListener
@@ -741,8 +738,8 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
 
         // Move to top/bottom/left/right edges
         if (moveDirection == FloatingViewManager.MOVE_DIRECTION_NEAREST) {
-            val distLeftRight = Math.min(startX, positionLimitRect.width() - startX)
-            val distTopBottom = Math.min(startY, positionLimitRect.height() - startY)
+            val distLeftRight = min(startX, positionLimitRect.width() - startX)
+            val distTopBottom = min(startY, positionLimitRect.height() - startY)
             if (distLeftRight >= distTopBottom) {
                 val isMoveTopEdge = startY < (metrics.heightPixels - height) / 2
                 goalPositionY = if (isMoveTopEdge) positionLimitRect.top else positionLimitRect.bottom
@@ -849,7 +846,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
         safeInsetRect.set(safeInsetRectVal)
     }
 
-    internal class FloatingAnimationHandler(floatingView: FloatingView) : Handler() {
+    internal class FloatingAnimationHandler(floatingView: FloatingView) : Handler(Looper.getMainLooper()) {
         private var startTime: Long = 0
         private var startX = 0f
         private var startY = 0f
@@ -876,12 +873,12 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
                 mIsChangeState = false
             }
             val elapsedTime = SystemClock.uptimeMillis() - startTime.toFloat()
-            val trackingTargetTimeRate = Math.min(elapsedTime / CAPTURE_DURATION_MILLIS, 1.0f)
+            val trackingTargetTimeRate = min(elapsedTime / CAPTURE_DURATION_MILLIS, 1.0f)
             if (mState == FloatingViewState.STATE_NORMAL) {
                 val basePosition = calcAnimationPosition(trackingTargetTimeRate)
                 val moveLimitRect = floatingView.moveLimitRect1
-                val targetPositionX = Math.min(Math.max(moveLimitRect.left, touchPositionX.toInt()), moveLimitRect.right).toFloat()
-                val targetPositionY = Math.min(Math.max(moveLimitRect.top, touchPositionY.toInt()), moveLimitRect.bottom).toFloat()
+                val targetPositionX = min(max(moveLimitRect.left, touchPositionX.toInt()), moveLimitRect.right).toFloat()
+                val targetPositionY = min(max(moveLimitRect.top, touchPositionY.toInt()), moveLimitRect.bottom).toFloat()
                 params.x = (startX + (targetPositionX - startX) * basePosition).toInt()
                 params.y = (startY + (targetPositionY - startY) * basePosition).toInt()
                 floatingView.updateViewLayout()
@@ -933,9 +930,9 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
             private fun calcAnimationPosition(timeRate: Float): Float {
                 // y=0.55sin(8.0564x-π/2)+0.55
                 return if (timeRate <= 0.4) {
-                    (0.55 * Math.sin(8.0564 * timeRate - Math.PI / 2) + 0.55).toFloat()
+                    (0.55 * sin(8.0564 * timeRate - Math.PI / 2) + 0.55).toFloat()
                 } else {
-                    (4 * Math.pow(0.417 * timeRate - 0.341, 2.0) - 4 * Math.pow(0.417 - 0.341, 2.0) + 1).toFloat()
+                    (4 * (0.417 * timeRate - 0.341).pow(2.0) - 4 * (0.417 - 0.341).pow(2.0) + 1).toFloat()
                 }
             }
 
@@ -957,7 +954,7 @@ internal class FloatingView(context: Context) : FrameLayout(context), ViewTreeOb
         }
     }
 
-    internal class LongPressHandler(view: FloatingView) : Handler() {
+    internal class LongPressHandler(view: FloatingView) : Handler(Looper.getMainLooper()) {
         private val mFloatingView: WeakReference<FloatingView> = WeakReference(view)
         override fun handleMessage(msg: Message) {
             val view = mFloatingView.get()
