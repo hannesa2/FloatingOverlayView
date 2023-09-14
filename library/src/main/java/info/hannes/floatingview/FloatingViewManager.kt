@@ -21,11 +21,11 @@ import java.util.*
 class FloatingViewManager(private val context: Context, listener: FloatingViewListener?) : ScreenChangedListener, OnTouchListener, TrashViewListener {
 
     @IntDef(DISPLAY_MODE_SHOW_ALWAYS, DISPLAY_MODE_HIDE_ALWAYS, DISPLAY_MODE_HIDE_FULLSCREEN)
-    @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
+    @Retention(AnnotationRetention.SOURCE)
     annotation class DisplayMode
 
     @IntDef(MOVE_DIRECTION_DEFAULT, MOVE_DIRECTION_LEFT, MOVE_DIRECTION_RIGHT, MOVE_DIRECTION_NEAREST, MOVE_DIRECTION_NONE, MOVE_DIRECTION_THROWN)
-    @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
+    @Retention(AnnotationRetention.SOURCE)
     annotation class MoveDirection
 
     private val resources: Resources = context.resources
@@ -65,8 +65,7 @@ class FloatingViewManager(private val context: Context, listener: FloatingViewLi
     override fun onScreenChanged(windowRect: Rect?, visibility: Int) {
         // detect status bar
         val isFitSystemWindowTop = windowRect!!.top == 0
-        val isHideStatusBar: Boolean
-        isHideStatusBar = isFitSystemWindowTop
+        val isHideStatusBar: Boolean = isFitSystemWindowTop
 
         // detect navigation bar
         val isHideNavigationBar: Boolean = if (visibility == FullscreenObserverView.NO_LAST_VISIBILITY) {
