@@ -6,7 +6,7 @@ import info.hannes.floatingView.sample.R
 
 class FloatingViewSettingsFragment : PreferenceFragmentCompat() {
 
-    override fun onCreatePreferences(savedInstanceState: Bundle, rootKey: String) {
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings_floatingview, null)
     }
 
