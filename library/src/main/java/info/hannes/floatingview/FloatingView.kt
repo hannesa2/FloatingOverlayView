@@ -175,6 +175,8 @@ internal class FloatingView(context: Context, val docking: Boolean) : FrameLayou
         windowLayoutParams.y = initY
         if (moveDirection == FloatingViewManager.MOVE_DIRECTION_NONE) {
             moveTo(initX, initY, initX, initY, false)
+        } else if (!docking) {
+            Unit
         } else {
             initialAnimationRunning = true
             moveToEdge(initX, initY, animateInitialMove)
