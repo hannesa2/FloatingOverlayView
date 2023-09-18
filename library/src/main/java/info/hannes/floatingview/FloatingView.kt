@@ -176,7 +176,7 @@ internal class FloatingView(context: Context, val docking: Boolean) : FrameLayou
         if (moveDirection == FloatingViewManager.MOVE_DIRECTION_NONE) {
             moveTo(initX, initY, initX, initY, false)
         } else if (!docking) {
-            Unit
+            Timber.d("Skip moveToEdge for non docking")
         } else {
             initialAnimationRunning = true
             moveToEdge(initX, initY, animateInitialMove)
