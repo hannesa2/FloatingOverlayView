@@ -456,7 +456,7 @@ internal class FloatingView(context: Context, val docking: Boolean) : FrameLayou
     }
 
     private fun addMovement(event: MotionEvent) {
-        Timber.d("()")
+        Timber.d("event=$event")
         val deltaX = event.rawX - event.x
         val deltaY = event.rawY - event.y
         event.offsetLocation(deltaX, deltaY)
@@ -490,21 +490,21 @@ internal class FloatingView(context: Context, val docking: Boolean) : FrameLayou
     }
 
     private fun moveToEdge(withAnimation: Boolean) {
-        Timber.d("() withAnimation=$withAnimation")
+        Timber.d("withAnimation=$withAnimation")
         val currentX = xByTouch
         val currentY = yByTouch
         moveToEdge(currentX, currentY, withAnimation)
     }
 
     private fun moveToEdge(startX: Int, startY: Int, withAnimation: Boolean) {
-        Timber.d("() startX:$startX startY=$startY withAnimation=$withAnimation")
+        Timber.d("startX:$startX startY=$startY withAnimation=$withAnimation")
         val goalPositionX = getGoalPositionX(startX, startY)
         val goalPositionY = getGoalPositionY(startX, startY)
         moveTo(startX, startY, goalPositionX, goalPositionY, withAnimation)
     }
 
     private fun moveTo(currentX: Int, currentY: Int, goalPositionXVal: Int, goalPositionYVal: Int, withAnimation: Boolean) {
-        Timber.d("()")
+        Timber.d("currentX=$currentX currentY=$currentY goalPositionXVal=$goalPositionXVal goalPositionYVal=$goalPositionYVal")
         var goalPositionX = goalPositionXVal
         var goalPositionY = goalPositionYVal
         goalPositionX = min(max(positionLimitRect.left, goalPositionX), positionLimitRect.right)
@@ -538,7 +538,7 @@ internal class FloatingView(context: Context, val docking: Boolean) : FrameLayou
      * @param currentY      current Y coordinate
      */
     private fun startPhysicsAnimation(goalPositionX: Int, currentY: Int) {
-        Timber.d("()")
+        Timber.d("goalPositionX=$goalPositionX currentY=$currentY")
         // start X coordinate animation
         val containsLimitRectWidth = windowLayoutParams.x < positionLimitRect.right && windowLayoutParams.x > positionLimitRect.left
         // If MOVE_DIRECTION_NONE, play fling animation
@@ -771,7 +771,7 @@ internal class FloatingView(context: Context, val docking: Boolean) : FrameLayou
     }
 
     private fun setScale(newScale: Float) {
-        Timber.d("()")
+        Timber.d("newScale=$newScale")
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
             val childCount = childCount
             for (i in 0 until childCount) {
@@ -786,27 +786,27 @@ internal class FloatingView(context: Context, val docking: Boolean) : FrameLayou
     }
 
     fun setDraggable(isDraggable: Boolean) {
-        Timber.d("()")
+        Timber.d("isDraggable=$isDraggable")
         draggable = isDraggable
     }
 
     fun setOverMargin(margin: Int) {
-        Timber.d("()")
+        Timber.d("margin=$margin")
         overMargin = margin
     }
 
     fun setOverMarginX(margin: Int) {
-        Timber.d("()")
+        Timber.d("margin=$margin")
         overMarginX = margin
     }
 
     fun setOverMarginY(margin: Int) {
-        Timber.d("()")
+        Timber.d("margin=$margin")
         overMarginY = margin
     }
 
     fun setMoveDirection(moveDirectionVal: Int) {
-        Timber.d("()")
+        Timber.d("moveDirectionVal=$moveDirectionVal")
         moveDirection = moveDirectionVal
     }
 
@@ -817,18 +817,18 @@ internal class FloatingView(context: Context, val docking: Boolean) : FrameLayou
      * @param usePhysicsVal Setting this to false will revert to using a ValueAnimator (default is true)
      */
     fun usePhysics(usePhysicsVal: Boolean) {
-        Timber.d("()")
+        Timber.d("usePhysicsVal=$usePhysicsVal")
         usePhysics = usePhysicsVal
     }
 
     fun setInitCoords(x: Int, y: Int) {
-        Timber.d("()")
+        Timber.d("x=$x y=$y")
         initX = x
         initY = y
     }
 
     fun setAnimateInitialMove(animateInitialMove: Boolean) {
-        Timber.d("()")
+        Timber.d("animateInitialMove=$animateInitialMove")
         this.animateInitialMove = animateInitialMove
     }
 
@@ -851,7 +851,7 @@ internal class FloatingView(context: Context, val docking: Boolean) : FrameLayou
     }
 
     fun setIntersecting(centerX: Int, centerY: Int) {
-        Timber.d("()")
+        Timber.d("centerX=$centerX centerY=$centerY")
         animationHandler.state = FloatingViewState.STATE_INTERSECTING
         animationHandler.updateTargetPosition(centerX.toFloat(), centerY.toFloat())
     }

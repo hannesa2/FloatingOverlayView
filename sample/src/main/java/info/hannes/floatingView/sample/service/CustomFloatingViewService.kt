@@ -78,8 +78,9 @@ class CustomFloatingViewService : Service(), FloatingViewListener {
             editor.putInt(PREF_KEY_LAST_POSITION_X, x)
             editor.putInt(PREF_KEY_LAST_POSITION_Y, y)
             editor.apply()
-        }
-        Timber.d("isFinishing")
+            Timber.d("isFinishing save x=$x y=$y")
+        } else
+            Timber.d("isFinishing")
     }
 
     private fun destroy() {
