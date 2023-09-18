@@ -37,11 +37,7 @@ internal class FullscreenObserverView(context: Context?, private val screenChang
     }
 
     override fun onDetachedFromWindow() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            viewTreeObserver.removeOnGlobalLayoutListener(this)
-        } else {
-            viewTreeObserver.removeGlobalOnLayoutListener(this)
-        }
+        viewTreeObserver.removeOnGlobalLayoutListener(this)
         setOnSystemUiVisibilityChangeListener(null)
         super.onDetachedFromWindow()
     }

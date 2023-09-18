@@ -8,10 +8,7 @@ import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
-import android.os.Build
-import android.os.Handler
-import android.os.Message
-import android.os.SystemClock
+import android.os.*
 import android.util.DisplayMetrics
 import android.view.*
 import android.view.animation.OvershootInterpolator
@@ -19,6 +16,8 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.annotation.IntDef
 import java.lang.ref.WeakReference
+import kotlin.math.max
+import kotlin.math.min
 
 internal class TrashView(context: Context) : FrameLayout(context), ViewTreeObserver.OnPreDrawListener {
 
@@ -126,7 +125,7 @@ internal class TrashView(context: Context) : FrameLayout(context), ViewTreeObser
         animationHandler.targetHeight = height
         val newWidthScale = width / actionTrashIconBaseWidth * shape
         val newHeightScale = height / actionTrashIconBaseHeight * shape
-        actionTrashIconMaxScale = Math.max(newWidthScale, newHeightScale)
+        actionTrashIconMaxScale = max(newWidthScale, newHeightScale)
         enterScaleAnimator = ObjectAnimator.ofPropertyValuesHolder(actionTrashIconView, PropertyValuesHolder.ofFloat(ImageView.SCALE_X, actionTrashIconMaxScale), PropertyValuesHolder.ofFloat(ImageView.SCALE_Y, actionTrashIconMaxScale))
         enterScaleAnimator!!.interpolator = OvershootInterpolator()
         enterScaleAnimator!!.duration = TRASH_ICON_SCALE_DURATION_MILLIS
@@ -244,7 +243,7 @@ internal class TrashView(context: Context) : FrameLayout(context), ViewTreeObser
         }
     }
 
-    internal class AnimationHandler(trashView: TrashView) : Handler() {
+    internal class AnimationHandler(trashView: TrashView) : Handler(Looper.getMainLooper()) {
         private var startTime: Long = 0
         private var startAlpha = 0f
         private var startTransitionY = 0f
@@ -287,16 +286,16 @@ internal class TrashView(context: Context) : FrameLayout(context), ViewTreeObser
             if (animationCode == ANIMATION_OPEN) {
                 val currentAlpha = backgroundView.alpha
                 if (currentAlpha < MAX_ALPHA) {
-                    val alphaTimeRate = Math.min(elapsedTime / BACKGROUND_DURATION_MILLIS, 1.0f)
-                    val alpha = Math.min(startAlpha + alphaTimeRate, MAX_ALPHA)
+                    val alphaTimeRate = min(elapsedTime / BACKGROUND_DURATION_MILLIS, 1.0f)
+                    val alpha = min(startAlpha + alphaTimeRate, MAX_ALPHA)
                     backgroundView.alpha = alpha
                 }
                 if (elapsedTime >= TRASH_OPEN_START_DELAY_MILLIS) {
                     val screenHeight = trashView.metrics.heightPixels.toFloat()
                     val positionX = trashViewX + (targetPositionX + targetWidth) / (screenWidth + targetWidth) * trashIconLimitPosition.width() + trashIconLimitPosition.left
-                    val targetPositionYRate = Math.min(2 * (targetPositionY + targetHeight) / (screenHeight + targetHeight), 1.0f)
+                    val targetPositionYRate = min(2 * (targetPositionY + targetHeight) / (screenHeight + targetHeight), 1.0f)
                     val stickyPositionY = moveStickyYRange * targetPositionYRate + trashIconLimitPosition.height() - moveStickyYRange
-                    val translationYTimeRate = Math.min((elapsedTime - TRASH_OPEN_START_DELAY_MILLIS) / TRASH_OPEN_DURATION_MILLIS, 1.0f)
+                    val translationYTimeRate = min((elapsedTime - TRASH_OPEN_START_DELAY_MILLIS) / TRASH_OPEN_DURATION_MILLIS, 1.0f)
                     val positionY = trashIconLimitPosition.bottom - stickyPositionY * overshootInterpolator.getInterpolation(translationYTimeRate)
                     trashIconRootView.translationX = positionX
                     trashIconRootView.translationY = positionY
@@ -308,10 +307,10 @@ internal class TrashView(context: Context) : FrameLayout(context), ViewTreeObser
                 }
                 sendMessageAtTime(newMessage(animationCode, TYPE_UPDATE), SystemClock.uptimeMillis() + ANIMATION_REFRESH_TIME_MILLIS)
             } else if (animationCode == ANIMATION_CLOSE) {
-                val alphaElapseTimeRate = Math.min(elapsedTime / BACKGROUND_DURATION_MILLIS, 1.0f)
-                val alpha = Math.max(startAlpha - alphaElapseTimeRate, MIN_ALPHA)
+                val alphaElapseTimeRate = min(elapsedTime / BACKGROUND_DURATION_MILLIS, 1.0f)
+                val alpha = max(startAlpha - alphaElapseTimeRate, MIN_ALPHA)
                 backgroundView.alpha = alpha
-                val translationYTimeRate = Math.min(elapsedTime / TRASH_CLOSE_DURATION_MILLIS, 1.0f)
+                val translationYTimeRate = min(elapsedTime / TRASH_CLOSE_DURATION_MILLIS, 1.0f)
                 if (alphaElapseTimeRate < 1.0f || translationYTimeRate < 1.0f) {
                     val position = startTransitionY + trashIconLimitPosition.height() * translationYTimeRate
                     trashIconRootView.translationY = position
