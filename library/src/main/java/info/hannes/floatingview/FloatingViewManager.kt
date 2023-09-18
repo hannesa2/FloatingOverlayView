@@ -315,7 +315,7 @@ class FloatingViewManager(private val context: Context, listener: FloatingViewLi
          */
         var usePhysics: Boolean = true
         var animateInitialMove: Boolean = true
-        var docking: Boolean = true
+        var docking: Boolean = false
     }
 
     companion object {
