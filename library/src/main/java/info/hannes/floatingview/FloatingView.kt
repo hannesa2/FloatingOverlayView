@@ -22,7 +22,7 @@ import kotlin.math.*
 /**
  * http://stackoverflow.com/questions/18503050/how-to-create-draggabble-system-alert-in-android
  */
-internal class FloatingView(context: Context, val docking: Boolean) : FrameLayout(context), ViewTreeObserver.OnPreDrawListener {
+class FloatingView(context: Context, val docking: Boolean) : FrameLayout(context), ViewTreeObserver.OnPreDrawListener {
 
     private val windowManager: WindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     val windowLayoutParams: WindowManager.LayoutParams = WindowManager.LayoutParams()
@@ -90,6 +90,11 @@ internal class FloatingView(context: Context, val docking: Boolean) : FrameLayou
 
     init {
         windowManager.defaultDisplay.getMetrics(metrics)
+        DEFAULT_X = metrics.widthPixels / 2
+        DEFAULT_Y = metrics.heightPixels / 2
+        initX = DEFAULT_X
+        initY = DEFAULT_Y
+
         windowLayoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT
         windowLayoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
         windowLayoutParams.type = OVERLAY_TYPE
@@ -166,15 +171,15 @@ internal class FloatingView(context: Context, val docking: Boolean) : FrameLayou
     override fun onPreDraw(): Boolean {
         viewTreeObserver.removeOnPreDrawListener(this)
         if (initX == DEFAULT_X) {
-            initX = 0
+            initX = metrics.widthPixels / 2
         }
         if (initY == DEFAULT_Y) {
-            initY = metrics.heightPixels - statusBarHeight - measuredHeight
+            initY = (metrics.heightPixels / 2) - statusBarHeight - measuredHeight
         }
         windowLayoutParams.x = initX
         windowLayoutParams.y = initY
         if (moveDirection == FloatingViewManager.MOVE_DIRECTION_NONE) {
-            moveTo(initX, initY, initX, initY, false)
+            moveTo(initX, initY, initX, initY, false, "onPreDraw")
         } else if (!docking) {
             Timber.d("Skip moveToEdge for non docking")
         } else {
@@ -337,7 +342,7 @@ internal class FloatingView(context: Context, val docking: Boolean) : FrameLayou
 //                val newY = (windowLayoutParams.y * positionLimitRect.height() / oldPositionLimitHeight.toFloat() + 0.5f).toInt()
 //                val goalPositionY = min(max(positionLimitRect.top, newY), positionLimitRect.bottom)
 //                moveTo(windowLayoutParams.x, windowLayoutParams.y, goalPositionX, goalPositionY, false)
-                moveTo(windowLayoutParams.x, windowLayoutParams.y, windowLayoutParams.x, windowLayoutParams.y, false)
+                moveTo(windowLayoutParams.x, windowLayoutParams.y, windowLayoutParams.x, windowLayoutParams.y, false, "refreshLimitRect")
             }
         }
         rotation = newRotation
@@ -501,11 +506,11 @@ internal class FloatingView(context: Context, val docking: Boolean) : FrameLayou
         Timber.d("startX:$startX startY=$startY withAnimation=$withAnimation")
         val goalPositionX = getGoalPositionX(startX, startY)
         val goalPositionY = getGoalPositionY(startX, startY)
-        moveTo(startX, startY, goalPositionX, goalPositionY, withAnimation)
+        moveTo(startX, startY, goalPositionX, goalPositionY, withAnimation, "Edge")
     }
 
-    private fun moveTo(currentX: Int, currentY: Int, goalPositionXVal: Int, goalPositionYVal: Int, withAnimation: Boolean) {
-        Timber.d("currentX=$currentX currentY=$currentY goalPositionXVal=$goalPositionXVal goalPositionYVal=$goalPositionYVal")
+    private fun moveTo(currentX: Int, currentY: Int, goalPositionXVal: Int, goalPositionYVal: Int, withAnimation: Boolean, tag: String = "") {
+        Timber.d("$tag currentX=$currentX currentY=$currentY goalPositionXVal=$goalPositionXVal goalPositionYVal=$goalPositionYVal")
         var goalPositionX = goalPositionXVal
         var goalPositionY = goalPositionYVal
         goalPositionX = min(max(positionLimitRect.left, goalPositionX), positionLimitRect.right)
@@ -1013,8 +1018,8 @@ internal class FloatingView(context: Context, val docking: Boolean) : FrameLayou
         private const val MAX_X_VELOCITY_SCALE_DOWN_VALUE = 9f
         private const val MAX_Y_VELOCITY_SCALE_DOWN_VALUE = 8f
         private const val THROW_THRESHOLD_SCALE_DOWN_VALUE = 9f
-        const val DEFAULT_X = Int.MIN_VALUE
-        const val DEFAULT_Y = Int.MIN_VALUE
+        var DEFAULT_X = Int.MIN_VALUE
+        var DEFAULT_Y = Int.MIN_VALUE
         const val DEFAULT_WIDTH = ViewGroup.LayoutParams.WRAP_CONTENT
         const val DEFAULT_HEIGHT = ViewGroup.LayoutParams.WRAP_CONTENT
         private var OVERLAY_TYPE = 0

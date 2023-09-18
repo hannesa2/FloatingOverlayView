@@ -17,6 +17,7 @@ import android.widget.ImageView
 import androidx.core.app.NotificationCompat
 import info.hannes.floatingView.sample.DeleteActionActivity
 import info.hannes.floatingView.sample.R
+import info.hannes.floatingview.FloatingView
 import info.hannes.floatingview.FloatingViewListener
 import info.hannes.floatingview.FloatingViewManager
 import timber.log.Timber
@@ -133,8 +134,8 @@ class CustomFloatingViewService : Service(), FloatingViewListener {
         // Last position
         val isUseLastPosition = sharedPref.getBoolean("settings_save_last_position", false)
         if (isUseLastPosition) {
-            val defaultX = options.floatingViewX
-            val defaultY = options.floatingViewY
+            val defaultX = metrics.widthPixels / 2
+            val defaultY = metrics.heightPixels / 2
             options.floatingViewX = sharedPref.getInt(PREF_KEY_LAST_POSITION_X, defaultX)
             options.floatingViewY = sharedPref.getInt(PREF_KEY_LAST_POSITION_Y, defaultY)
             Timber.d("Restore position x=${options.floatingViewX} y=${options.floatingViewY}")
