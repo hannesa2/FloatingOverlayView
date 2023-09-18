@@ -10,7 +10,6 @@ import android.net.Uri
 import android.os.IBinder
 import android.os.Parcelable
 import android.preference.PreferenceManager
-import android.text.TextUtils
 import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.WindowManager
@@ -138,14 +137,22 @@ class CustomFloatingViewService : Service(), FloatingViewListener {
             val defaultY = options.floatingViewY
             options.floatingViewX = sharedPref.getInt(PREF_KEY_LAST_POSITION_X, defaultX)
             options.floatingViewY = sharedPref.getInt(PREF_KEY_LAST_POSITION_Y, defaultY)
+            Timber.d("Restore position x=${options.floatingViewX} y=${options.floatingViewY}")
         } else {
             // Init X/Y
-            val initXSettings = sharedPref.getString("settings_init_x", "")
-            val initYSettings = sharedPref.getString("settings_init_y", "")
-            if (!TextUtils.isEmpty(initXSettings) && !TextUtils.isEmpty(initYSettings)) {
+            val initXSettings = sharedPref.getString("settings_init_x", POSITiON_DEFAULT)
+            val initYSettings = sharedPref.getString("settings_init_y", POSITiON_DEFAULT)
+            if (!(initXSettings == POSITiON_DEFAULT) && !(initYSettings == POSITiON_DEFAULT)) {
                 val offset = (48 + 8 * metrics.density).toInt()
                 options.floatingViewX = (metrics.widthPixels * initXSettings!!.toFloat() - offset).toInt()
                 options.floatingViewY = (metrics.heightPixels * initYSettings!!.toFloat() - offset).toInt()
+                Timber.d("Initial position preserve x=${options.floatingViewX} y=${options.floatingViewY}")
+            } else {
+                // center on default
+                val offset = (48 + 8 * metrics.density).toInt()
+                options.floatingViewX = (metrics.widthPixels / 2 - offset)
+                options.floatingViewY = (metrics.heightPixels / 2 - offset)
+                Timber.d("Initial position x=${options.floatingViewX} y=${options.floatingViewY}")
             }
         }
 
@@ -156,6 +163,7 @@ class CustomFloatingViewService : Service(), FloatingViewListener {
     }
 
     companion object {
+        const val POSITiON_DEFAULT = "0"
         const val EXTRA_CUTOUT_SAFE_AREA = "cutout_safe_area"
         private const val NOTIFICATION_ID = 908114
         private const val PREF_KEY_LAST_POSITION_X = "last_position_x"
