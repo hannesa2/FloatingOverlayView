@@ -333,9 +333,9 @@ internal class FloatingView(context: Context, val docking: Boolean) : FrameLayou
                 moveToEdge(windowLayoutParams.x, windowLayoutParams.y, false)
             } else {
                 val newX = (windowLayoutParams.x * positionLimitRect.width() / oldPositionLimitWidth.toFloat() + 0.5f).toInt()
-                val goalPositionX = Math.min(Math.max(positionLimitRect.left, newX), positionLimitRect.right)
+                val goalPositionX = min(max(positionLimitRect.left, newX), positionLimitRect.right)
                 val newY = (windowLayoutParams.y * positionLimitRect.height() / oldPositionLimitHeight.toFloat() + 0.5f).toInt()
-                val goalPositionY = Math.min(Math.max(positionLimitRect.top, newY), positionLimitRect.bottom)
+                val goalPositionY = min(max(positionLimitRect.top, newY), positionLimitRect.bottom)
                 moveTo(windowLayoutParams.x, windowLayoutParams.y, goalPositionX, goalPositionY, false)
             }
         }
@@ -404,7 +404,7 @@ internal class FloatingView(context: Context, val docking: Boolean) : FrameLayou
             if (touchDownTime != event.downTime) {
                 return !isOnInterceptTouchEvent
             }
-            if (!moveAccept && Math.abs(screenTouchX - screenTouchDownX) < moveThreshold && Math.abs(screenTouchY - screenTouchDownY) < moveThreshold) {
+            if (!moveAccept && abs(screenTouchX - screenTouchDownX) < moveThreshold && abs(screenTouchY - screenTouchDownY) < moveThreshold) {
                 return !isOnInterceptTouchEvent
             }
             moveAccept = true
