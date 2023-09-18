@@ -763,7 +763,7 @@ internal class FloatingView(context: Context, val docking: Boolean) : FrameLayou
     }
 
     private fun cancelAnimation() {
-        Timber.d("()")
+        Timber.v("()")
         if (moveEdgeAnimator != null && moveEdgeAnimator!!.isStarted) {
             moveEdgeAnimator!!.cancel()
             moveEdgeAnimator = null
