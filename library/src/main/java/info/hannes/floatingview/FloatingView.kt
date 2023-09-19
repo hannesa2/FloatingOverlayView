@@ -462,7 +462,7 @@ class FloatingView(context: Context, val docking: Boolean) : FrameLayout(context
     }
 
     private fun addMovement(event: MotionEvent) {
-        Timber.d("event=$event")
+        Timber.v("event=$event")
         val deltaX = event.rawX - event.x
         val deltaY = event.rawY - event.y
         event.offsetLocation(deltaX, deltaY)
