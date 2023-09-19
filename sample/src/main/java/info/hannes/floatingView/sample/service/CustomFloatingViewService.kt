@@ -17,7 +17,6 @@ import android.widget.ImageView
 import androidx.core.app.NotificationCompat
 import info.hannes.floatingView.sample.DeleteActionActivity
 import info.hannes.floatingView.sample.R
-import info.hannes.floatingview.FloatingView
 import info.hannes.floatingview.FloatingViewListener
 import info.hannes.floatingview.FloatingViewManager
 import timber.log.Timber
@@ -141,9 +140,9 @@ class CustomFloatingViewService : Service(), FloatingViewListener {
             Timber.d("Restore position x=${options.floatingViewX} y=${options.floatingViewY}")
         } else {
             // Init X/Y
-            val initXSettings = sharedPref.getString("settings_init_x", POSITiON_DEFAULT)
-            val initYSettings = sharedPref.getString("settings_init_y", POSITiON_DEFAULT)
-            if (!(initXSettings == POSITiON_DEFAULT) && !(initYSettings == POSITiON_DEFAULT)) {
+            val initXSettings = sharedPref.getString("settings_init_x", POSITION_DEFAULT)
+            val initYSettings = sharedPref.getString("settings_init_y", POSITION_DEFAULT)
+            if (!(initXSettings == POSITION_DEFAULT) && !(initYSettings == POSITION_DEFAULT)) {
                 val offset = (48 + 8 * metrics.density).toInt()
                 options.floatingViewX = (metrics.widthPixels * initXSettings!!.toFloat() - offset).toInt()
                 options.floatingViewY = (metrics.heightPixels * initYSettings!!.toFloat() - offset).toInt()
@@ -164,7 +163,7 @@ class CustomFloatingViewService : Service(), FloatingViewListener {
     }
 
     companion object {
-        const val POSITiON_DEFAULT = "0"
+        const val POSITION_DEFAULT = "0"
         const val EXTRA_CUTOUT_SAFE_AREA = "cutout_safe_area"
         private const val NOTIFICATION_ID = 908114
         private const val PREF_KEY_LAST_POSITION_X = "last_position_x"
