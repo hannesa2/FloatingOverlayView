@@ -5,12 +5,20 @@ plugins {
 }
 
 android {
+    namespace 'info.hannes.floatingview'
+
     compileSdkVersion 34
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 34
     }
-    namespace 'info.hannes.floatingview'
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
 }
 
 dependencies {
