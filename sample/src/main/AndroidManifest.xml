@@ -4,6 +4,7 @@
     <!-- Foreground Service permission(API level 28 or higher) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
     <application
         android:name="info.hannes.logcat.LoggingApplication"
@@ -32,6 +33,7 @@
             android:exported="false" />
         <service
             android:name="info.hannes.floatingView.sample.service.CustomFloatingViewService"
+            android:foregroundServiceType="dataSync"
             android:exported="false" />
 
     </application>
