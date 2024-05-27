@@ -179,7 +179,24 @@ class CustomFloatingViewService : Service(), FloatingViewListener {
             builder.setCategory(NotificationCompat.CATEGORY_SERVICE)
 
             val notifyIntent = Intent(context, DeleteActionActivity::class.java)
-            val notifyPendingIntent = PendingIntent.getActivity(context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+            val requestID = System.currentTimeMillis().toInt() + Random.nextInt(0, 1000)
+
+            val notifyPendingIntent: PendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                PendingIntent.getActivity(
+                    /* context = */ context,
+                    /* requestCode = */ requestID,
+                    /* intent = */ notifyIntent,
+                    /* flags = */PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+            } else {
+                PendingIntent.getActivity(
+                    /* context = */ context,
+                    /* requestCode = */ requestID,
+                    /* intent = */ notifyIntent,
+                    /* flags = */ PendingIntent.FLAG_UPDATE_CURRENT
+                )
+            }
             builder.setContentIntent(notifyPendingIntent)
             return builder.build()
         }
