@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
 import android.net.Uri
+import android.os.Build
 import android.os.IBinder
 import android.os.Parcelable
 import android.preference.PreferenceManager
@@ -20,6 +21,7 @@ import info.hannes.floatingView.sample.R
 import info.hannes.floatingview.FloatingViewListener
 import info.hannes.floatingview.FloatingViewManager
 import timber.log.Timber
+import kotlin.random.Random
 
 class CustomFloatingViewService : Service(), FloatingViewListener {
 
