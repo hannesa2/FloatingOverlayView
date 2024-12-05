@@ -60,7 +60,10 @@ class CustomFloatingViewService : Service(), FloatingViewListener {
     }
 
     override fun onDestroy() {
-        destroy()
+        floatingViewManager?.apply {
+            removeAllViewToWindow()
+        }
+        floatingViewManager = null
         super.onDestroy()
     }
 
@@ -82,13 +85,6 @@ class CustomFloatingViewService : Service(), FloatingViewListener {
             Timber.d("isFinishing save x=$x y=$y")
         } else
             Timber.d("isFinishing")
-    }
-
-    private fun destroy() {
-        floatingViewManager?.apply {
-            removeAllViewToWindow()
-        }
-        floatingViewManager = null
     }
 
     private fun loadDynamicOptions() {
