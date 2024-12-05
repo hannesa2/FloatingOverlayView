@@ -14,9 +14,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.google.android.material.snackbar.Snackbar
 import info.hannes.floatingView.sample.R
 import info.hannes.floatingView.sample.databinding.FragmentFloatingViewControlBinding
 import info.hannes.floatingView.sample.service.CustomFloatingViewService
@@ -49,7 +49,7 @@ class FloatingViewControlFragment : Fragment() {
             showFloatingView(activity, isShowOverlayPermission = true, isCustomFloatingView = true)
         }
         binding.showSettings.setOnClickListener {
-            val ft = fragmentManager!!.beginTransaction()
+            val ft = requireFragmentManager().beginTransaction()
             ft.replace(R.id.container, FloatingViewSettingsFragment.newInstance())
             ft.addToBackStack(null)
             ft.commit()
@@ -77,13 +77,37 @@ class FloatingViewControlFragment : Fragment() {
         }
         if (isShowOverlayPermission) {
             try {
-                val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context!!.packageName))
-                startActivityForResult(
-                    intent,
-                    if (isCustomFloatingView) CUSTOM_OVERLAY_PERMISSION_REQUEST_CODE else CHATHEAD_OVERLAY_PERMISSION_REQUEST_CODE
-                )
+                val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + requireContext().packageName))
+                requireContext().packageManager?.let {
+                    if (it.resolveActivity(intent, 0) != null)
+                        startActivityForResult(
+                            intent,
+                            if (isCustomFloatingView)
+                                CUSTOM_OVERLAY_PERMISSION_REQUEST_CODE
+                            else
+                                CHATHEAD_OVERLAY_PERMISSION_REQUEST_CODE
+                        )
+                    else {
+                        Snackbar.make(
+                            requireActivity().findViewById(android.R.id.content),
+                            "Activity handling ACTION_MANAGE_OVERLAY_PERMISSION not exists",
+                            Snackbar.LENGTH_LONG
+                        )
+                            .setAction("Ok") {
+                            }
+                            .show()
+                        Timber.e("Activity handling ACTION_MANAGE_OVERLAY_PERMISSION not exists")
+                    }
+                }
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
+                Snackbar.make(
+                    requireActivity().findViewById(android.R.id.content),
+                    e.message.toString(),
+                    Snackbar.LENGTH_LONG
+                )
+                    .setAction("Ok") {
+                    }
+                    .show()
                 Timber.e(e)
             }
         }
