@@ -71,13 +71,8 @@ class FloatingViewManager(private val context: Context, listener: FloatingViewLi
         // detect navigation bar
         val isHideNavigationBar: Boolean = if (visibility == FullscreenObserverView.NO_LAST_VISIBILITY) {
             // At the first it can not get the correct value, so do special processing
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                windowManager.defaultDisplay.getRealMetrics(displayMetrics)
-                windowRect.width() - displayMetrics.widthPixels == 0 && windowRect.bottom - displayMetrics.heightPixels == 0
-            } else {
-                windowManager.defaultDisplay.getMetrics(displayMetrics)
-                windowRect.width() - displayMetrics.widthPixels > 0 || windowRect.height() - displayMetrics.heightPixels > 0
-            }
+            windowManager.defaultDisplay.getRealMetrics(displayMetrics)
+            windowRect.width() - displayMetrics.widthPixels == 0 && windowRect.bottom - displayMetrics.heightPixels == 0
         } else {
             visibility and View.SYSTEM_UI_FLAG_HIDE_NAVIGATION == View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
         }

@@ -140,21 +140,9 @@ class FloatingView(context: Context, val docking: Boolean) : FrameLayout(context
     }
 
     private fun hasSoftNavigationBar(): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            val realDisplayMetrics = DisplayMetrics()
-            windowManager.defaultDisplay.getRealMetrics(realDisplayMetrics)
-            return realDisplayMetrics.heightPixels > metrics.heightPixels || realDisplayMetrics.widthPixels > metrics.widthPixels
-        }
-
-        // old device check flow
-        // Navigation bar exists (config_showNavigationBar is true, or both the menu key and the back key are not exists)
-        val context = context
-        val resources = context.resources
-        val hasMenuKey = ViewConfiguration.get(context).hasPermanentMenuKey()
-        val hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK)
-        val showNavigationBarResId = resources.getIdentifier("config_showNavigationBar", "bool", "android")
-        val hasNavigationBarConfig = showNavigationBarResId != 0 && resources.getBoolean(showNavigationBarResId)
-        return hasNavigationBarConfig || !hasMenuKey && !hasBackKey
+        val realDisplayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getRealMetrics(realDisplayMetrics)
+        return realDisplayMetrics.heightPixels > metrics.heightPixels || realDisplayMetrics.widthPixels > metrics.widthPixels
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -244,16 +232,15 @@ class FloatingView(context: Context, val docking: Boolean) : FrameLayout(context
         var navigationBarVerticalDiff = 0
         val hasSoftNavigationBar = hasSoftNavigationBar()
         // auto hide navigation bar(Galaxy S8, S9 and so on.)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            val realDisplayMetrics = DisplayMetrics()
-            windowManager.defaultDisplay.getRealMetrics(realDisplayMetrics)
-            currentNavigationBarHeight = realDisplayMetrics.heightPixels - windowRect.bottom
-            currentNavigationBarWidth = realDisplayMetrics.widthPixels - metrics.widthPixels
-            navigationBarVerticalDiff = baseNavigationBarHeight - currentNavigationBarHeight
-        }
+        val realDisplayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getRealMetrics(realDisplayMetrics)
+        currentNavigationBarHeight = realDisplayMetrics.heightPixels - windowRect.bottom
+        currentNavigationBarWidth = realDisplayMetrics.widthPixels - metrics.widthPixels
+        navigationBarVerticalDiff = baseNavigationBarHeight - currentNavigationBarHeight
         if (!isHideNavigationBar) {
             navigationBarVerticalOffset = if (navigationBarVerticalDiff != 0 && baseNavigationBarHeight == 0 ||
-                    !hasSoftNavigationBar && baseNavigationBarHeight != 0) {
+                !hasSoftNavigationBar && baseNavigationBarHeight != 0
+            ) {
                 if (hasSoftNavigationBar) {
                     // 1.auto hide mode -> show mode
                     // 2.show mode -> auto hide mode -> home
@@ -318,8 +305,10 @@ class FloatingView(context: Context, val docking: Boolean) : FrameLayout(context
         val height = measuredHeight
         val newScreenWidth = metrics.widthPixels
         val newScreenHeight = metrics.heightPixels
-        moveLimitRect1[-width, -height * 2, newScreenWidth + width + navigationBarHorizontalOffset] = newScreenHeight + height + navigationBarVerticalOffset
-        positionLimitRect[-overMargin - overMarginX, 0, newScreenWidth - width + overMargin + overMarginY + navigationBarHorizontalOffset] = newScreenHeight - statusBarHeight - height + navigationBarVerticalOffset
+        moveLimitRect1[-width, -height * 2, newScreenWidth + width + navigationBarHorizontalOffset] =
+            newScreenHeight + height + navigationBarVerticalOffset
+        positionLimitRect[-overMargin - overMarginX, 0, newScreenWidth - width + overMargin + overMarginY + navigationBarHorizontalOffset] =
+            newScreenHeight - statusBarHeight - height + navigationBarVerticalOffset
 
         // Initial animation stop when the device rotates
         val newRotation = windowManager.defaultDisplay.rotation
@@ -776,17 +765,8 @@ class FloatingView(context: Context, val docking: Boolean) : FrameLayout(context
 
     private fun setScale(newScale: Float) {
         Timber.d("newScale=$newScale")
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
-            val childCount = childCount
-            for (i in 0 until childCount) {
-                val targetView = getChildAt(i)
-                targetView.scaleX = newScale
-                targetView.scaleY = newScale
-            }
-        } else {
-            scaleX = newScale
-            scaleY = newScale
-        }
+        scaleX = newScale
+        scaleY = newScale
     }
 
     fun setDraggable(isDraggable: Boolean) {
