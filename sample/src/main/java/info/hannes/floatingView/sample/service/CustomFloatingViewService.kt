@@ -186,17 +186,17 @@ class CustomFloatingViewService : Service(), FloatingViewListener {
 
             val notifyPendingIntent: PendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 PendingIntent.getActivity(
-                    /* context = */ context,
-                    /* requestCode = */ requestID,
-                    /* intent = */ notifyIntent,
-                    /* flags = */PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    context,
+                    requestID,
+                    notifyIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
             } else {
                 PendingIntent.getActivity(
-                    /* context = */ context,
-                    /* requestCode = */ requestID,
-                    /* intent = */ notifyIntent,
-                    /* flags = */ PendingIntent.FLAG_UPDATE_CURRENT
+                    context,
+                    requestID,
+                    notifyIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT
                 )
             }
             builder.setContentIntent(notifyPendingIntent)

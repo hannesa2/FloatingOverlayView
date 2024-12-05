@@ -8,7 +8,7 @@ android {
     namespace 'info.hannes.floatingview'
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 21
         compileSdk 35
         targetSdk 35
     }

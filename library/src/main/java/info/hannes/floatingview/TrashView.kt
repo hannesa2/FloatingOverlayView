@@ -300,10 +300,6 @@ internal class TrashView(context: Context) : FrameLayout(context), ViewTreeObser
                     trashIconRootView.translationX = positionX
                     trashIconRootView.translationY = positionY
                     // clear drag view garbage
-                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                        clearClippedChildren(trashView.rootView)
-                        clearClippedChildren(trashView.mTrashIconRootView)
-                    }
                 }
                 sendMessageAtTime(newMessage(animationCode, TYPE_UPDATE), SystemClock.uptimeMillis() + ANIMATION_REFRESH_TIME_MILLIS)
             } else if (animationCode == ANIMATION_CLOSE) {
