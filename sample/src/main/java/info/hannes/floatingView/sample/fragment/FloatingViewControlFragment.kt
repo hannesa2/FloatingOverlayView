@@ -9,6 +9,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
@@ -74,6 +76,16 @@ class FloatingViewControlFragment : Fragment() {
         if (Settings.canDrawOverlays(context)) {
             startFloatingViewService(activity, isCustomFloatingView)
             return
+        } else {
+            Snackbar.make(
+                requireActivity().findViewById(android.R.id.content),
+                "You need Settings.canDrawOverlays()",
+                Snackbar.LENGTH_LONG
+            )
+                .setAction("Ok") {
+                }
+                .show()
+            Timber.w("You need Settings.canDrawOverlays()")
         }
         if (isShowOverlayPermission) {
             try {
@@ -88,14 +100,17 @@ class FloatingViewControlFragment : Fragment() {
                                 CHATHEAD_OVERLAY_PERMISSION_REQUEST_CODE
                         )
                     else {
-                        Snackbar.make(
-                            requireActivity().findViewById(android.R.id.content),
-                            "Activity handling ACTION_MANAGE_OVERLAY_PERMISSION not exists",
-                            Snackbar.LENGTH_LONG
-                        )
-                            .setAction("Ok") {
-                            }
-                            .show()
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            Snackbar.make(
+                                requireActivity().findViewById(android.R.id.content),
+                                "Activity handling ACTION_MANAGE_OVERLAY_PERMISSION not exists",
+                                Snackbar.LENGTH_LONG
+                            )
+                                .setAction("Ok") {
+                                }
+                                .show()
+                        }, 1500)
+
                         Timber.e("Activity handling ACTION_MANAGE_OVERLAY_PERMISSION not exists")
                     }
                 }
