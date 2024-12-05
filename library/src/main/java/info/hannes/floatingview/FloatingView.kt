@@ -313,8 +313,6 @@ class FloatingView(context: Context, val docking: Boolean) : FrameLayout(context
      */
     private fun refreshLimitRect() {
         cancelAnimation()
-        val oldPositionLimitWidth = positionLimitRect.width()
-        val oldPositionLimitHeight = positionLimitRect.height()
         windowManager.defaultDisplay.getMetrics(metrics)
         val width = measuredWidth
         val height = measuredHeight

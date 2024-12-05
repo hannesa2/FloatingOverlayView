@@ -41,10 +41,10 @@ class FloatingViewControlFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.showDemo.setOnClickListener {
-            showFloatingView(activity, true, false)
+            showFloatingView(activity, isShowOverlayPermission = true, isCustomFloatingView = false)
         }
         binding.showCustomizedDemo.setOnClickListener {
-            showFloatingView(activity, true, true)
+            showFloatingView(activity, isShowOverlayPermission = true, isCustomFloatingView = true)
         }
         binding.showSettings.setOnClickListener {
             val ft = fragmentManager!!.beginTransaction()
@@ -57,9 +57,9 @@ class FloatingViewControlFragment : Fragment() {
     @TargetApi(Build.VERSION_CODES.M)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == CHATHEAD_OVERLAY_PERMISSION_REQUEST_CODE) {
-            showFloatingView(activity, false, false)
+            showFloatingView(activity, isShowOverlayPermission = false, isCustomFloatingView = false)
         } else if (requestCode == CUSTOM_OVERLAY_PERMISSION_REQUEST_CODE) {
-            showFloatingView(activity, false, true)
+            showFloatingView(activity, isShowOverlayPermission = false, isCustomFloatingView = true)
         }
     }
 
