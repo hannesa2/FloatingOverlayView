@@ -37,6 +37,13 @@ class FloatingViewControlFragment : Fragment() {
         return view
     }
 
+    override fun onResume() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            binding.canDraw.isChecked = Settings.canDrawOverlays(requireContext())
+        } else
+            binding.canDraw.visibility = View.GONE
+        super.onResume()
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
