@@ -7,8 +7,8 @@ android {
     defaultConfig {
         applicationId "info.hannes.floatingView.sample"
         minSdkVersion 19
-        compileSdk 34
-        targetSdk 34
+        compileSdk 35
+        targetSdk 35
         versionCode getGitCommitCount()
         versionName getVersion()
     }

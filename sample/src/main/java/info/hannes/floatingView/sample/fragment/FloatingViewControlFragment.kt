@@ -14,13 +14,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import info.hannes.floatingView.sample.R
 import info.hannes.floatingView.sample.databinding.FragmentFloatingViewControlBinding
-import info.hannes.floatingView.sample.service.SimpleFloatingViewService
 import info.hannes.floatingView.sample.service.CustomFloatingViewService
+import info.hannes.floatingView.sample.service.SimpleFloatingViewService
 import info.hannes.floatingview.FloatingViewManager
+import timber.log.Timber
 
 class FloatingViewControlFragment : Fragment() {
 
@@ -74,8 +76,16 @@ class FloatingViewControlFragment : Fragment() {
             return
         }
         if (isShowOverlayPermission) {
-            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context!!.packageName))
-            startActivityForResult(intent, if (isCustomFloatingView) CUSTOM_OVERLAY_PERMISSION_REQUEST_CODE else CHATHEAD_OVERLAY_PERMISSION_REQUEST_CODE)
+            try {
+                val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context!!.packageName))
+                startActivityForResult(
+                    intent,
+                    if (isCustomFloatingView) CUSTOM_OVERLAY_PERMISSION_REQUEST_CODE else CHATHEAD_OVERLAY_PERMISSION_REQUEST_CODE
+                )
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
+                Timber.e(e)
+            }
         }
     }
 
